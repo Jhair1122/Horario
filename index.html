@@ -7,112 +7,324 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="ClassTimes">
-  <link rel="manifest" href="data:application/manifest+json,{
-    %22name%22:%22ClassTimes%22,
-    %22short_name%22:%22ClassTimes%22,
-    %22start_url%22:%22.%22,
-    %22display%22:%22standalone%22,
-    %22background_color%22:%22%23f2f4f8%22,
-    %22theme_color%22:%22%230a2540%22,
-    %22icons%22:[
-      {%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a2540'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-family='monospace'%3ECT%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22%7D
-    ]
-  }">
-  <title>ClassTimes</title>
+  <title>ClassTimes · Horario exacto</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background: #f2f4f8;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-      padding: 1rem 0.85rem 2.5rem 0.85rem;
-      color: #111;
+      background: #f5f7fb;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 1rem 0.9rem 2.5rem 0.9rem;
+      color: #1e2a3e;
     }
-    .schedule-container { max-width:700px; margin:0 auto; }
-    .class-header { margin-bottom:1.5rem; border-bottom:2px solid #d0d7de; }
-    .class-header h1 {
-      font-size:1.9rem; font-weight:700; color:#0a2540;
-      background:#fff; display:inline-block; padding-right:1rem;
+
+    .app-container {
+      max-width: 680px;
+      margin: 0 auto;
     }
-    .schedule-card {
-      background: white; border-radius: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      margin-bottom: 0.85rem; padding: 1rem 1.1rem; border: 1px solid #e9edf2;
+
+    /* cabecera exacta como en las imágenes */
+    .main-header {
+      margin-bottom: 1.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid #dce5ef;
     }
-    .day-line {
-      display: flex; align-items: baseline; gap: 0.5rem;
-      margin-bottom: 0.65rem; border-left: 4px solid #2c7da0; padding-left: 0.75rem;
+    .main-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #0f2b3b;
+      background: white;
+      display: inline-block;
+      padding-right: 1rem;
+    }
+
+    /* cada sección representa una imagen original */
+    .section {
+      background: white;
+      border-radius: 24px;
+      margin-bottom: 2rem;
+      padding: 1rem 0.2rem 1rem 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+      border: 1px solid #eef2f6;
+    }
+    .section-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      color: #5c7c8f;
+      padding: 0 1rem 0.6rem 1rem;
+      border-bottom: 1px dashed #e2e8f0;
+      margin-bottom: 0.6rem;
+    }
+
+    /* cada entrada individual */
+    .entry {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid #eff3f8;
+    }
+    .entry:last-child {
+      border-bottom: none;
+    }
+
+    /* día y hora / número */
+    .entry-day-row {
+      display: flex;
+      align-items: baseline;
       flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 0.4rem;
     }
-    .day-name { font-weight:800; font-size:1.35rem; color:#1f5068; }
-    .time-slot {
-      font-family: monospace; font-weight:500; font-size:0.9rem;
-      background:#eef2f7; padding:0.2rem 0.7rem; border-radius:40px;
-      color:#1e3a4d;
+    .day-name {
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #1e4a6b;
+      min-width: 55px;
     }
-    .course-name { font-weight:700; font-size:1rem; color:#0c2e3e; margin-bottom:0.25rem; word-break:break-word; }
-    .teacher-name { font-size:0.9rem; color:#2c5a6e; margin-bottom:0.2rem; }
-    .location-text {
-      font-size:0.85rem; color:#4b6a7c; background:#f8fafc;
-      display:inline-block; padding:0.2rem 0.5rem; border-radius:12px;
-      margin-top:0.25rem; font-family:monospace;
+    .time-badge {
+      font-family: 'SF Mono', 'JetBrains Mono', monospace;
+      background: #eef2f9;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #1d4d6b;
     }
     .numeric-value {
-      font-weight:600; font-size:1.2rem; background:#f1f5f9;
-      display:inline-block; padding:0.2rem 1rem; border-radius:30px;
-      color:#0f3b4f; font-family:monospace;
+      font-family: monospace;
+      background: #eef2f9;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0f3b4f;
     }
-    footer { text-align:center; font-size:0.7rem; color:#8a9cb0; margin-top:2rem; border-top:1px solid #e2e8f0; padding-top:1rem; }
+
+    /* detalles del curso */
+    .course-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin: 0.35rem 0 0.2rem 0;
+      color: #0c2e3e;
+      word-break: break-word;
+    }
+    .teacher-name {
+      font-size: 0.88rem;
+      color: #3c6e8c;
+      margin-bottom: 0.2rem;
+    }
+    .location {
+      font-size: 0.8rem;
+      color: #5f7f95;
+      background: #f8fafd;
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 14px;
+      font-family: monospace;
+      margin-top: 0.2rem;
+    }
+
+    /* para entradas que solo tienen número (sin materia) */
+    .simple-number {
+      margin-top: 0.15rem;
+    }
+
+    hr {
+      margin: 0.5rem 0;
+      border: none;
+      height: 1px;
+      background: #e9edf2;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #8da1b5;
+      margin-top: 1rem;
+      padding-top: 0.5rem;
+    }
   </style>
 </head>
 <body>
-<div class="schedule-container">
-  <div class="class-header"><h1>ClassTimes</h1></div>
-  <div id="horario-exacto"></div>
-  <footer>Horario oficial — app local instalable</footer>
+<div class="app-container">
+  <div class="main-header">
+    <h1>ClassTimes</h1>
+  </div>
+
+  <!-- ========================================= -->
+  <!-- SECCIÓN 1: IMAGEN 1000053832.jpg (exacta) -->
+  <!-- ========================================= -->
+  <div class="section">
+    <div class="section-title">📷 Vista 1 · imagen 3832</div>
+    <!-- Dom 17 (dos veces) -->
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Dom</span><span class="numeric-value">17</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Dom</span><span class="numeric-value">17</span></div></div>
+    <!-- Dom 18 (dos veces) -->
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Dom</span><span class="numeric-value">18</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Dom</span><span class="numeric-value">18</span></div></div>
+    <!-- Lun con horario completo -->
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">Lun</span><span class="time-badge">7:45 AM - 10:00 AM</span></div>
+      <div class="course-name">ARTIF INTEL WITH MACH LEAR JAV</div>
+      <div class="teacher-name">UTOS CERAS, LUIS ALBERTO</div>
+      <div class="location">CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108</div>
+    </div>
+    <!-- Mié 19 (dos veces) -->
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mié</span><span class="numeric-value">19</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mié</span><span class="numeric-value">19</span></div></div>
+    <!-- Mié 20 (dos veces) -->
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mié</span><span class="numeric-value">20</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mié</span><span class="numeric-value">20</span></div></div>
+    <!-- Jue 21 (una vez, según imagen) -->
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Jue</span><span class="numeric-value">21</span></div></div>
+  </div>
+
+  <!-- ========================================= -->
+  <!-- SECCIÓN 2: IMAGEN 1000053833.jpg (exacta, incluye lista numérica + bloques) -->
+  <!-- ========================================= -->
+  <div class="section">
+    <div class="section-title">📷 Vista 2 · imagen 3833</div>
+    <!-- Primer bloque: lista de días con números -->
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Dom</span><span class="numeric-value">17</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Dom</span><span class="numeric-value">18</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Lun</span><span class="numeric-value">19</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mar</span><span class="numeric-value">20</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mie</span><span class="numeric-value">21</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Jue</span><span class="numeric-value">22</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Vie</span><span class="numeric-value">23</span></div></div>
+
+    <!-- Separador visual (como en la imagen) -->
+    <div style="height: 1px; background: #e2e8f0; margin: 0.5rem 1rem;"></div>
+
+    <!-- Entrada: Mie con 8:00 AM - 1:00 PM (Formación práctica) -->
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">Mie</span><span class="time-badge">8:00 AM - 1:00 PM</span></div>
+      <div class="course-name">FORMACIÓN PRÁCTICA EN EMPI</div>
+      <div class="teacher-name">DOCENTE NO ASIGNADO,</div>
+      <div class="location">ENTORNO VIRTUAL SV-EV - N/A</div>
+    </div>
+
+    <!-- Entrada: 2:00 PM - 5:00 PM (sin día explícito en la imagen, lo mostramos así) -->
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">2:00 PM - 5:00 PM</span></div>
+      <div class="course-name">SEMINARIO COMPLEMENT PRÁCTI</div>
+      <div class="teacher-name">UTOS CERAS, LUIS ALBERTO</div>
+      <div class="location">CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108</div>
+    </div>
+
+    <!-- Entrada: 6:31 PM - 7:59 PM DESARROLLO HUMANO -->
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">6:31 PM - 7:59 PM</span></div>
+      <div class="course-name">DESARROLLO HUMANO</div>
+      <div class="teacher-name">BALTZAR VASQUEZ, NICANOR FELIX</div>
+      <div class="location">CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205</div>
+    </div>
+
+    <!-- Entrada: 8:00 AM - 1:00 PM (Formación práctica, repetida dos veces según imagen) -->
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">8:00 AM - 1:00 PM</span></div>
+      <div class="course-name">FORMACIÓN PRÁCTICA EN EMPI</div>
+      <div class="teacher-name">DOCENTE NO ASIGNADO,</div>
+      <div class="location">ENTORNO VIRTUAL SV-EV - N/A</div>
+    </div>
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">8:00 AM - 1:00 PM</span></div>
+      <div class="course-name">FORMACIÓN PRÁCTICA EN EMPI</div>
+      <div class="teacher-name">DOCENTE NO ASIGNADO,</div>
+      <div class="location">ENTORNO VIRTUAL SV-EV - N/A</div>
+    </div>
+
+    <!-- Entrada final: 22 Vie 8:00 AM - 1:00 PM -->
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">Vie</span><span class="numeric-value">22</span></div>
+      <div class="time-badge" style="margin-left: 0.5rem;">8:00 AM - 1:00 PM</div>
+      <div class="course-name">FORMACIÓN PRÁCTICA EN EMPI</div>
+      <div class="teacher-name">DOCENTE NO ASIGNADO,</div>
+      <div class="location">ENTORNO VIRTUAL SV-EV - N/A</div>
+    </div>
+  </div>
+
+  <!-- ========================================= -->
+  <!-- SECCIÓN 3: IMAGEN 1000050627.jpg (exacta) -->
+  <!-- ========================================= -->
+  <div class="section">
+    <div class="section-title">📷 Vista 3 · imagen 0627</div>
+    <!-- Pares de números por día -->
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Dom</span><span class="numeric-value">10</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Dom</span><span class="numeric-value">11</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Lun</span><span class="numeric-value">11</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Lun</span><span class="numeric-value">12</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mar</span><span class="numeric-value">12</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mar</span><span class="numeric-value">13</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mie</span><span class="numeric-value">13</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Mie</span><span class="numeric-value">14</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Jue</span><span class="numeric-value">14</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Jue</span><span class="numeric-value">15</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Vie</span><span class="numeric-value">15</span></div></div>
+    <div class="entry"><div class="entry-day-row"><span class="day-name">Vie</span><span class="numeric-value">16</span></div></div>
+
+    <!-- Cursos detallados -->
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">7:45 AM - 10:00 AM</span></div>
+      <div class="course-name">ARTIF INTEL WITH MACH LEAR JAV</div>
+      <div class="teacher-name">UTOS CERAS, LUIS ALBERTO</div>
+      <div class="location">CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108</div>
+    </div>
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">10:15 AM - 12:30 PM</span></div>
+      <div class="course-name">ARTIF INTEL WITH MACH LEAR JAV</div>
+      <div class="teacher-name">UTOS CERAS, LUIS ALBERTO</div>
+      <div class="location">CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108</div>
+    </div>
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">3:30 PM - 6:30 PM</span></div>
+      <div class="course-name">ARTIF INTEL WITH MACH LEAR JAV</div>
+      <div class="teacher-name">UTOS CERAS, LUIS ALBERTO</div>
+      <div class="location">CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108</div>
+    </div>
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">8:00 AM - 1:00 PM</span></div>
+      <div class="course-name">FORMACIÓN PRÁCTICA EN EMPI</div>
+      <div class="teacher-name">DOCENTE NO ASIGNADO,</div>
+      <div class="location">ENTORNO VIRTUAL SV-EV - N/A</div>
+    </div>
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">2:00 PM - 5:00 PM</span></div>
+      <div class="course-name">SEMINARIO COMPLEMENT PRÁCTI</div>
+      <div class="teacher-name">UTOS CERAS, LUIS ALBERTO</div>
+      <div class="location">CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108</div>
+    </div>
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">10:00 PM - 11:00 PM</span></div>
+      <div class="course-name">REV Y CALIF CUADERNOS INFORME</div>
+      <div class="teacher-name">UTOS CERAS, LUIS ALBERTO</div>
+      <div class="location">ENTORNO VIRTUAL SV-EV - N/A</div>
+    </div>
+    <div class="entry">
+      <div class="entry-day-row"><span class="day-name">—</span><span class="time-badge">8:00 AM - 1:00 PM</span></div>
+      <div class="course-name">FORMACIÓN PRÁCTICA EN EMPI</div>
+      <div class="teacher-name">DOCENTE NO ASIGNADO</div>
+      <!-- sin ubicación, tal como aparece en la imagen -->
+    </div>
+  </div>
+
+  <footer>Horario original — sin omitir ningún número ni clase</footer>
 </div>
+
+<!-- Service Worker para instalación como app local (modo offline básico) -->
 <script>
-  const entries = [
-    { day:"Dom", num:"17" },{ day:"Dom", num:"18" },
-    { day:"Lun", time:"7:45 AM - 10:00 AM", course:"ARTIF INTEL WITH MACH LEAR JAV", teacher:"UTOS CERAS, LUIS ALBERTO", loc:"CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-    { day:"Mié", num:"19" },{ day:"Mié", num:"20" },{ day:"Jue", num:"21" },{ day:"Jue", num:"22" },{ day:"Vie", num:"23" },
-    { day:"Lun", time:"10:15 AM - 12:30 PM", course:"ARTIF INTEL WITH MACH LEAR JAV", teacher:"UTOS CERAS, LUIS ALBERTO", loc:"CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-    { day:"Mié", time:"8:00 AM - 1:00 PM", course:"FORMACIÓN PRÁCTICA EN EMPI", teacher:"DOCENTE NO ASIGNADO,", loc:"ENTORNO VIRTUAL SV-EV - N/A" },
-    { day:"Mar", time:"2:00 PM - 5:00 PM", course:"SEMINARIO COMPLEMENT PRÁCTI", teacher:"UTOS CERAS, LUIS ALBERTO", loc:"CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-    { day:"Mié", time:"10:00 PM - 11:00 PM", course:"REV Y CALIF CUADERNOS INFORME", teacher:"UTOS CERAS, LUIS ALBERTO", loc:"ENTORNO VIRTUAL SV-EV - N/A" },
-    { day:"Mié", time:"8:00 AM - 1:00 PM", course:"FORMACIÓN PRÁCTICA EN EMPI", teacher:"DOCENTE NO ASIGNADO", loc:null }
-  ];
-  const container = document.getElementById('horario-exacto');
-  entries.forEach(e => {
-    const card = document.createElement('div'); card.className = 'schedule-card';
-    const line = document.createElement('div'); line.className = 'day-line';
-    const daySpan = document.createElement('span'); daySpan.className = 'day-name'; daySpan.textContent = e.day;
-    line.appendChild(daySpan);
-    if(e.num) { const badge = document.createElement('span'); badge.className = 'time-slot'; badge.textContent = e.num; line.appendChild(badge); }
-    else if(e.time) { const badge = document.createElement('span'); badge.className = 'time-slot'; badge.textContent = e.time; line.appendChild(badge); }
-    card.appendChild(line);
-    if(e.num) {
-      const extra = document.createElement('div'); extra.className = 'simple-info';
-      const pill = document.createElement('span'); pill.className = 'numeric-value'; pill.textContent = e.num;
-      extra.appendChild(pill); card.appendChild(extra);
-    } else if(e.course) {
-      const block = document.createElement('div'); block.className = 'course-detail';
-      const cn = document.createElement('div'); cn.className = 'course-name'; cn.textContent = e.course;
-      block.appendChild(cn);
-      if(e.teacher) { const tn = document.createElement('div'); tn.className = 'teacher-name'; tn.textContent = e.teacher; block.appendChild(tn); }
-      if(e.loc) { const locSpan = document.createElement('div'); locSpan.className = 'location-text'; locSpan.textContent = e.loc; block.appendChild(locSpan); }
-      card.appendChild(block);
-    }
-    container.appendChild(card);
-  });
-  // Service Worker para modo offline y funcionamiento como app instalada
-  if('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('data:application/javascript,' + encodeURIComponent(`
-      self.addEventListener('fetch', function(event) {
+      self.addEventListener('fetch', event => {
         event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
       });
-      self.addEventListener('install', function(event) {
-        self.skipWaiting();
-      });
-    `)).then(reg => console.log('SW registrado', reg)).catch(err => console.log('SW error', err));
+      self.addEventListener('install', () => self.skipWaiting());
+    `)).catch(console.log);
   }
 </script>
 </body>
