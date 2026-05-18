@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <title>ClassTimes · Horario exacto</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f4f8;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, sans-serif;
+      padding: 1rem 0.85rem 2.5rem 0.85rem;
+      color: #111;
+    }
+
+    /* contenedor principal: igual al estilo de la imagen, limpio y legible */
+    .schedule-container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* encabezado exacto: "ClassTimes" como en la imagen */
+    .class-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #d0d7de;
+    }
+
+    .class-header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #0a2540;
+      background: #ffffff;
+      display: inline-block;
+      padding-right: 1rem;
+      font-family: inherit;
+    }
+
+    /* cada entrada del horario — idéntico estilo tarjeta minimal */
+    .schedule-card {
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+      margin-bottom: 0.85rem;
+      padding: 1rem 1.1rem;
+      transition: none;
+      border: 1px solid #e9edf2;
+    }
+
+    /* línea de día y hora juntos */
+    .day-line {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
+      border-left: 4px solid #2c7da0;
+      padding-left: 0.75rem;
+    }
+
+    .day-name {
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.2px;
+      background: none;
+      color: #1f5068;
+      line-height: 1.2;
+    }
+
+    .time-slot {
+      font-family: 'SF Mono', 'JetBrains Mono', monospace;
+      font-weight: 500;
+      font-size: 0.9rem;
+      background: #eef2f7;
+      padding: 0.2rem 0.7rem;
+      border-radius: 40px;
+      color: #1e3a4d;
+      letter-spacing: -0.1px;
+    }
+
+    /* detalles de materia, docente, ubicación */
+    .course-detail {
+      margin-top: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .course-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0c2e3e;
+      margin-bottom: 0.25rem;
+      word-break: break-word;
+      line-height: 1.35;
+    }
+
+    .teacher-name {
+      font-size: 0.9rem;
+      color: #2c5a6e;
+      margin-bottom: 0.2rem;
+      word-break: break-word;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+
+    .location-text {
+      font-size: 0.85rem;
+      color: #4b6a7c;
+      background: #f8fafc;
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+      margin-top: 0.25rem;
+      word-break: break-word;
+      font-family: monospace;
+    }
+
+    /* para los elementos numéricos simples (17,18,19,20,21,22,23) */
+    .numeric-value {
+      font-weight: 600;
+      font-size: 1.2rem;
+      background: #f1f5f9;
+      display: inline-block;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      color: #0f3b4f;
+      letter-spacing: 0.5px;
+      font-family: monospace;
+    }
+
+    .simple-info {
+      margin-top: 0.25rem;
+    }
+
+    /* separador sutil pero sin inventar detalles */
+    hr {
+      margin: 1.2rem 0;
+      border: none;
+      height: 1px;
+      background: #dce3ec;
+    }
+
+    /* mantener exactitud tipográfica */
+    .no-location {
+      opacity: 0;
+      height: 0;
+      display: none;
+    }
+
+    /* respeta todos los textos originales, sin cortes */
+    .break-words {
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    /* el mismo espaciado que la imagen en lista vertical */
+    footer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #8a9cb0;
+      margin-top: 2rem;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="schedule-container">
+  <div class="class-header">
+    <h1>ClassTimes</h1>
+  </div>
+
+  <div id="horario-exacto"></div>
+  <footer>Horario oficial — copia fiel al contenido original</footer>
+</div>
+
+<script>
+  // --------------------------------------------------------------
+  // DATOS EXACTOS EXTRAÍDOS DE LA IMAGEN (sin modificar ni omitir)
+  // Cada entrada refleja fielmente: día, hora/valor numérico,
+  // materia, docente, ubicación (tal cual aparece, incluyendo comas)
+  // --------------------------------------------------------------
+  const scheduleEntries = [
+    // --- PRIMER BLOQUE (DOM, LUN, MIÉ, JUE, VIE) según imagen ---
+    {
+      day: "Dom",
+      numericOnly: true,
+      numericValue: "17",
+      customTime: null,
+      course: null,
+      teacher: null,
+      location: null
+    },
+    {
+      day: "Dom",
+      numericOnly: true,
+      numericValue: "18",
+      customTime: null,
+      course: null,
+      teacher: null,
+      location: null
+    },
+    {
+      day: "Lun",
+      numericOnly: false,
+      timeRange: "7:45 AM - 10:00 AM",
+      course: "ARTIF INTEL WITH MACH LEAR JAV",
+      teacher: "UTOS CERAS, LUIS ALBERTO",
+      location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108"
+    },
+    {
+      day: "Mié",
+      numericOnly: true,
+      numericValue: "19",
+      customTime: null,
+      course: null,
+      teacher: null,
+      location: null
+    },
+    {
+      day: "Mié",
+      numericOnly: true,
+      numericValue: "20",
+      customTime: null,
+      course: null,
+      teacher: null,
+      location: null
+    },
+    {
+      day: "Jue",
+      numericOnly: true,
+      numericValue: "21",
+      customTime: null,
+      course: null,
+      teacher: null,
+      location: null
+    },
+    {
+      day: "Jue",
+      numericOnly: true,
+      numericValue: "22",
+      customTime: null,
+      course: null,
+      teacher: null,
+      location: null
+    },
+    {
+      day: "Vie",
+      numericOnly: true,
+      numericValue: "23",
+      customTime: null,
+      course: null,
+      teacher: null,
+      location: null
+    },
+    // --- SEGUNDO BLOQUE (LUN, MIÉ, MAR, MIÉ, MIÉ) exactamente como en la imagen ---
+    {
+      day: "Lun",
+      numericOnly: false,
+      timeRange: "10:15 AM - 12:30 PM",
+      course: "ARTIF INTEL WITH MACH LEAR JAV",
+      teacher: "UTOS CERAS, LUIS ALBERTO",
+      location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108"
+    },
+    {
+      day: "Mié",
+      numericOnly: false,
+      timeRange: "8:00 AM - 1:00 PM",
+      course: "FORMACIÓN PRÁCTICA EN EMPI",
+      teacher: "DOCENTE NO ASIGNADO,",
+      location: "ENTORNO VIRTUAL SV-EV - N/A"
+    },
+    {
+      day: "Mar",
+      numericOnly: false,
+      timeRange: "2:00 PM - 5:00 PM",
+      course: "SEMINARIO COMPLEMENT PRÁCTI",
+      teacher: "UTOS CERAS, LUIS ALBERTO",
+      location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108"
+    },
+    {
+      day: "Mié",
+      numericOnly: false,
+      timeRange: "10:00 PM - 11:00 PM",
+      course: "REV Y CALIF CUADERNOS INFORME",
+      teacher: "UTOS CERAS, LUIS ALBERTO",
+      location: "ENTORNO VIRTUAL SV-EV - N/A"
+    },
+    {
+      day: "Mié",
+      numericOnly: false,
+      timeRange: "8:00 AM - 1:00 PM",
+      course: "FORMACIÓN PRÁCTICA EN EMPI",
+      teacher: "DOCENTE NO ASIGNADO",     // sin coma y sin ubicación (tal cual aparece en la última línea)
+      location: null                      // explícitamente sin lugar, como en el original
+    }
+  ];
+
+  // función que renderiza CADA elemento exactamente igual a la descripción
+  function renderExactSchedule() {
+    const container = document.getElementById('horario-exacto');
+    if (!container) return;
+
+    // limpiar contenedor
+    container.innerHTML = '';
+
+    for (let i = 0; i < scheduleEntries.length; i++) {
+      const entry = scheduleEntries[i];
+      const card = document.createElement('div');
+      card.className = 'schedule-card';
+
+      // ---- construir línea día + hora / valor numérico ----
+      const dayLine = document.createElement('div');
+      dayLine.className = 'day-line';
+
+      const daySpan = document.createElement('span');
+      daySpan.className = 'day-name';
+      daySpan.textContent = entry.day;
+      dayLine.appendChild(daySpan);
+
+      // si es entrada numérica (17,18,19,20,21,22,23)
+      if (entry.numericOnly && entry.numericValue) {
+        const numericBadge = document.createElement('span');
+        numericBadge.className = 'time-slot';
+        numericBadge.textContent = entry.numericValue;
+        dayLine.appendChild(numericBadge);
+      } 
+      // entrada con horario definido (rango AM/PM o tiempo)
+      else if (entry.timeRange) {
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'time-slot';
+        timeSpan.textContent = entry.timeRange;
+        dayLine.appendChild(timeSpan);
+      }
+
+      card.appendChild(dayLine);
+
+      // ---- CUERPO DE LA ENTRADA: para valores numéricos solo mostramos el número (ya mostrado arriba) 
+      // pero la imagen también los muestra como ítem independiente, sin materia extra, tal cual.
+      // Para números: no mostramos curso ni profesor, sólo el valor numérico.
+      if (entry.numericOnly && entry.numericValue) {
+        // De acuerdo al original: debajo del día solamente se ve el número (sin etiquetas extra)
+        // Para ser absolutamente fiel, agregamos un pequeño bloque que replica el estilo
+        // pero sin texto adicional: el número principal ya está en la línea de tiempo.
+        // Aún así la imagen solo listaba "17" en su propia línea, así que añadimos una pequeña indicación visual
+        // que no agrega palabras diferentes: solo un fondo sutil mostrando el mismo número.
+        const extraNumeric = document.createElement('div');
+        extraNumeric.className = 'simple-info';
+        const numberPill = document.createElement('span');
+        numberPill.className = 'numeric-value';
+        numberPill.textContent = entry.numericValue;
+        extraNumeric.appendChild(numberPill);
+        card.appendChild(extraNumeric);
+      } 
+      else if (!entry.numericOnly && entry.course) {
+        // bloque completo de detalles: materia, docente, ubicación (cuando existe)
+        const courseBlock = document.createElement('div');
+        courseBlock.className = 'course-detail';
+
+        const courseNameSpan = document.createElement('div');
+        courseNameSpan.className = 'course-name';
+        courseNameSpan.textContent = entry.course;
+        courseBlock.appendChild(courseNameSpan);
+
+        if (entry.teacher) {
+          const teacherSpan = document.createElement('div');
+          teacherSpan.className = 'teacher-name';
+          teacherSpan.textContent = entry.teacher;
+          courseBlock.appendChild(teacherSpan);
+        }
+
+        // ubicación: EXACTAMENTE como está en el texto, si es null no se muestra
+        if (entry.location && entry.location.trim() !== "") {
+          const locationSpan = document.createElement('div');
+          locationSpan.className = 'location-text';
+          locationSpan.textContent = entry.location;
+          courseBlock.appendChild(locationSpan);
+        }
+
+        card.appendChild(courseBlock);
+      }
+
+      // (En caso de que alguna entrada tenga course pero no numericOnly, ya se cubrió)
+      container.appendChild(card);
+    }
+  }
+
+  // Ejecutar renderizado
+  renderExactSchedule();
+</script>
+</body>
+</html>
