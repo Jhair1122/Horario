@@ -2,118 +2,499 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0a2540">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2b4a91">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ClassTimes">
-  <link rel="manifest" href="data:application/manifest+json,{
-    %22name%22:%22ClassTimes%22,
-    %22short_name%22:%22ClassTimes%22,
-    %22start_url%22:%22.%22,
-    %22display%22:%22standalone%22,
-    %22background_color%22:%22%23f2f4f8%22,
-    %22theme_color%22:%22%230a2540%22,
-    %22icons%22:[
-      {%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a2540'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-family='monospace'%3ECT%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22%7D
-    ]
-  }">
   <title>ClassTimes</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: #f2f4f8;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-      padding: 1rem 0.85rem 2.5rem 0.85rem;
-      color: #111;
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      background: #edf0f6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Noto Sans', sans-serif;
+      color: #17202a;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    .schedule-container { max-width:700px; margin:0 auto; }
-    .class-header { margin-bottom:1.5rem; border-bottom:2px solid #d0d7de; }
-    .class-header h1 {
-      font-size:1.9rem; font-weight:700; color:#0a2540;
-      background:#fff; display:inline-block; padding-right:1rem;
+
+    /* ══════════════════════════
+       HEADER
+    ══════════════════════════ */
+    .header {
+      background: #2b4a91;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 18px 14px 14px;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
     }
-    .schedule-card {
-      background: white; border-radius: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      margin-bottom: 0.85rem; padding: 1rem 1.1rem; border: 1px solid #e9edf2;
+    .btn-back {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 2px;
+      opacity: 0.92;
     }
-    .day-line {
-      display: flex; align-items: baseline; gap: 0.5rem;
-      margin-bottom: 0.65rem; border-left: 4px solid #2c7da0; padding-left: 0.75rem;
-      flex-wrap: wrap;
+    .header-title {
+      font-size: 1.22rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
     }
-    .day-name { font-weight:800; font-size:1.35rem; color:#1f5068; }
-    .time-slot {
-      font-family: monospace; font-weight:500; font-size:0.9rem;
-      background:#eef2f7; padding:0.2rem 0.7rem; border-radius:40px;
-      color:#1e3a4d;
+
+    /* ══════════════════════════
+       WEEK STRIP
+    ══════════════════════════ */
+    .week-strip {
+      background: #2b4a91;
+      padding: 2px 2px 0;
+      position: sticky;
+      top: 56px;
+      z-index: 199;
+      user-select: none;
     }
-    .course-name { font-weight:700; font-size:1rem; color:#0c2e3e; margin-bottom:0.25rem; word-break:break-word; }
-    .teacher-name { font-size:0.9rem; color:#2c5a6e; margin-bottom:0.2rem; }
-    .location-text {
-      font-size:0.85rem; color:#4b6a7c; background:#f8fafc;
-      display:inline-block; padding:0.2rem 0.5rem; border-radius:12px;
-      margin-top:0.25rem; font-family:monospace;
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
     }
-    .numeric-value {
-      font-weight:600; font-size:1.2rem; background:#f1f5f9;
-      display:inline-block; padding:0.2rem 1rem; border-radius:30px;
-      color:#0f3b4f; font-family:monospace;
+    .day-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4px 1px 5px;
+      cursor: pointer;
     }
-    footer { text-align:center; font-size:0.7rem; color:#8a9cb0; margin-top:2rem; border-top:1px solid #e2e8f0; padding-top:1rem; }
+    .dc-name {
+      font-size: 0.67rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.52);
+      letter-spacing: 0.2px;
+      margin-bottom: 2px;
+    }
+    .dc-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+      transition: background 0.15s;
+    }
+    .dc-circle.is-selected {
+      background: #4db8ff;
+    }
+    .dc-num {
+      font-size: 1.08rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.78);
+      line-height: 1;
+    }
+    .dc-circle.is-selected .dc-num {
+      color: #fff;
+      font-weight: 700;
+    }
+    .dc-num.is-today {
+      color: #4db8ff;
+    }
+    .dc-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #4db8ff;
+    }
+    .dc-dot.hidden { visibility: hidden; }
+
+    /* pill handle */
+    .week-pill {
+      display: flex;
+      justify-content: center;
+      padding: 7px 0 9px;
+    }
+    .week-pill-bar {
+      width: 34px;
+      height: 3.5px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.18);
+    }
+
+    /* ══════════════════════════
+       SCHEDULE
+    ══════════════════════════ */
+    .schedule {
+      padding: 4px 10px 48px;
+    }
+
+    .day-row {
+      display: flex;
+      align-items: flex-start;
+      padding: 14px 2px 4px;
+      gap: 10px;
+    }
+
+    .day-label {
+      min-width: 48px;
+      text-align: center;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+    .dl-num {
+      font-size: 2.05rem;
+      font-weight: 300;
+      color: #a8b4bf;
+      line-height: 1;
+    }
+    .dl-num.active { color: #1a7fd4; }
+    .dl-abbr {
+      font-size: 0.75rem;
+      color: #a8b4bf;
+      margin-top: 2px;
+    }
+    .dl-abbr.active { color: #1a7fd4; }
+
+    .day-cards {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    /* empty day: just a horizontal rule */
+    .day-empty-line {
+      flex: 1;
+      height: 1px;
+      background: #ced5de;
+      align-self: center;
+      margin-top: 2px;
+    }
+
+    /* class card */
+    .class-card {
+      background: #ffffff;
+      border-radius: 13px;
+      padding: 13px 15px;
+      box-shadow:
+        0 1px 3px rgba(0,0,0,0.07),
+        0 0 1px rgba(0,0,0,0.04);
+    }
+    .cc-time {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #17202a;
+      margin-bottom: 3px;
+    }
+    .cc-course {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #17202a;
+      margin-bottom: 5px;
+    }
+    .cc-teacher {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #6b7c8d;
+      margin-bottom: 2px;
+    }
+    .cc-location {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: #6b7c8d;
+    }
+
+    /* swipe animation */
+    .schedule.slide-out-left  { animation: slideOutLeft  0.18s ease forwards; }
+    .schedule.slide-out-right { animation: slideOutRight 0.18s ease forwards; }
+    .schedule.slide-in-left   { animation: slideInLeft   0.18s ease forwards; }
+    .schedule.slide-in-right  { animation: slideInRight  0.18s ease forwards; }
+    @keyframes slideOutLeft  { to { opacity: 0; transform: translateX(-40px); } }
+    @keyframes slideOutRight { to { opacity: 0; transform: translateX( 40px); } }
+    @keyframes slideInLeft   { from { opacity: 0; transform: translateX( 40px); } to { opacity:1; transform:none; } }
+    @keyframes slideInRight  { from { opacity: 0; transform: translateX(-40px); } to { opacity:1; transform:none; } }
   </style>
 </head>
 <body>
-<div class="schedule-container">
-  <div class="class-header"><h1>ClassTimes</h1></div>
-  <div id="horario-exacto"></div>
-  <footer>Horario oficial — app local instalable</footer>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="btn-back" aria-label="Volver">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+         stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  </button>
+  <span class="header-title">ClassTimes</span>
+</header>
+
+<!-- WEEK STRIP -->
+<div class="week-strip">
+  <div class="week-grid" id="weekGrid"></div>
+  <div class="week-pill"><div class="week-pill-bar"></div></div>
 </div>
+
+<!-- SCHEDULE -->
+<div class="schedule" id="schedule"></div>
+
 <script>
-  const entries = [
-    { day:"Dom", num:"17" },{ day:"Dom", num:"18" },
-    { day:"Lun", time:"7:45 AM - 10:00 AM", course:"ARTIF INTEL WITH MACH LEAR JAV", teacher:"UTOS CERAS, LUIS ALBERTO", loc:"CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-    { day:"Mié", num:"19" },{ day:"Mié", num:"20" },{ day:"Jue", num:"21" },{ day:"Jue", num:"22" },{ day:"Vie", num:"23" },
-    { day:"Lun", time:"10:15 AM - 12:30 PM", course:"ARTIF INTEL WITH MACH LEAR JAV", teacher:"UTOS CERAS, LUIS ALBERTO", loc:"CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-    { day:"Mié", time:"8:00 AM - 1:00 PM", course:"FORMACIÓN PRÁCTICA EN EMPI", teacher:"DOCENTE NO ASIGNADO,", loc:"ENTORNO VIRTUAL SV-EV - N/A" },
-    { day:"Mar", time:"2:00 PM - 5:00 PM", course:"SEMINARIO COMPLEMENT PRÁCTI", teacher:"UTOS CERAS, LUIS ALBERTO", loc:"CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-    { day:"Mié", time:"10:00 PM - 11:00 PM", course:"REV Y CALIF CUADERNOS INFORME", teacher:"UTOS CERAS, LUIS ALBERTO", loc:"ENTORNO VIRTUAL SV-EV - N/A" },
-    { day:"Mié", time:"8:00 AM - 1:00 PM", course:"FORMACIÓN PRÁCTICA EN EMPI", teacher:"DOCENTE NO ASIGNADO", loc:null }
-  ];
-  const container = document.getElementById('horario-exacto');
-  entries.forEach(e => {
-    const card = document.createElement('div'); card.className = 'schedule-card';
-    const line = document.createElement('div'); line.className = 'day-line';
-    const daySpan = document.createElement('span'); daySpan.className = 'day-name'; daySpan.textContent = e.day;
-    line.appendChild(daySpan);
-    if(e.num) { const badge = document.createElement('span'); badge.className = 'time-slot'; badge.textContent = e.num; line.appendChild(badge); }
-    else if(e.time) { const badge = document.createElement('span'); badge.className = 'time-slot'; badge.textContent = e.time; line.appendChild(badge); }
-    card.appendChild(line);
-    if(e.num) {
-      const extra = document.createElement('div'); extra.className = 'simple-info';
-      const pill = document.createElement('span'); pill.className = 'numeric-value'; pill.textContent = e.num;
-      extra.appendChild(pill); card.appendChild(extra);
-    } else if(e.course) {
-      const block = document.createElement('div'); block.className = 'course-detail';
-      const cn = document.createElement('div'); cn.className = 'course-name'; cn.textContent = e.course;
-      block.appendChild(cn);
-      if(e.teacher) { const tn = document.createElement('div'); tn.className = 'teacher-name'; tn.textContent = e.teacher; block.appendChild(tn); }
-      if(e.loc) { const locSpan = document.createElement('div'); locSpan.className = 'location-text'; locSpan.textContent = e.loc; block.appendChild(locSpan); }
-      card.appendChild(block);
-    }
-    container.appendChild(card);
-  });
-  // Service Worker para modo offline y funcionamiento como app instalada
-  if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('data:application/javascript,' + encodeURIComponent(`
-      self.addEventListener('fetch', function(event) {
-        event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
-      });
-      self.addEventListener('install', function(event) {
-        self.skipWaiting();
-      });
-    `)).then(reg => console.log('SW registrado', reg)).catch(err => console.log('SW error', err));
+/* ─────────────────────────────────────────────────
+   DATA
+───────────────────────────────────────────────── */
+const WEEKS = [
+  /* ── SEMANA 10–16 (Image 2: Lun 11 seleccionado) ── */
+  {
+    days: [
+      { name: 'Dom', num: 10, dot: false,  selected: false, today: false },
+      { name: 'Lun', num: 11, dot: true,   selected: true,  today: false },
+      { name: 'Mar', num: 12, dot: true,   selected: false, today: false },
+      { name: 'Mie', num: 13, dot: true,   selected: false, today: false },
+      { name: 'Jue', num: 14, dot: true,   selected: false, today: false },
+      { name: 'Vie', num: 15, dot: true,   selected: false, today: false },
+      { name: 'Sab', num: 16, dot: false,  selected: false, today: false },
+    ],
+    schedule: [
+      {
+        num: 11, name: 'Lun', active: true,
+        classes: [
+          {
+            time:     '7:45 AM - 10:00 AM',
+            course:   'ARTIF INTEL WITH MACH LEAR JAV',
+            teacher:  'UTOS CERAS, LUIS ALBERTO',
+            location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108'
+          },
+          {
+            time:     '10:15 AM - 12:30 PM',
+            course:   'ARTIF INTEL WITH MACH LEAR JAV',
+            teacher:  'UTOS CERAS, LUIS ALBERTO',
+            location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108'
+          },
+          {
+            time:     '3:30 PM - 6:30 PM',
+            course:   'ARTIF INTEL WITH MACH LEAR JAV',
+            teacher:  'UTOS CERAS, LUIS ALBERTO',
+            location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108'
+          },
+        ]
+      },
+      {
+        num: 12, name: 'Mar', active: false,
+        classes: [
+          {
+            time:     '8:00 AM - 1:00 PM',
+            course:   'FORMACIÓN PRÁCTICA EN EMP I',
+            teacher:  'DOCENTE NO ASIGNADO,',
+            location: 'ENTORNO VIRTUAL SV-EV - N/A'
+          },
+          {
+            time:     '2:00 PM - 5:00 PM',
+            course:   'SEMINARIO COMPLEMENT PRÁCT I',
+            teacher:  'UTOS CERAS, LUIS ALBERTO',
+            location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108'
+          },
+          {
+            time:     '10:00 PM - 11:00 PM',
+            course:   'REV Y CALIF CUADERNOS INFORME',
+            teacher:  'UTOS CERAS, LUIS ALBERTO',
+            location: 'ENTORNO VIRTUAL SV-EV - N/A'
+          },
+        ]
+      },
+      {
+        num: 13, name: 'Mie', active: false,
+        classes: [
+          {
+            time:     '8:00 AM - 1:00 PM',
+            course:   'FORMACIÓN PRÁCTICA EN EMP I',
+            teacher:  'DOCENTE NO ASIGNADO,',
+            location: 'ENTORNO VIRTUAL SV-EV - N/A'
+          },
+        ]
+      },
+    ]
+  },
+
+  /* ── SEMANA 17–23 (Image 1: Mie 20 seleccionado, Lun 18 = hoy) ── */
+  {
+    days: [
+      { name: 'Dom', num: 17, dot: false,  selected: false, today: false },
+      { name: 'Lun', num: 18, dot: true,   selected: false, today: true  },
+      { name: 'Mar', num: 19, dot: false,  selected: false, today: false },
+      { name: 'Mie', num: 20, dot: true,   selected: true,  today: false },
+      { name: 'Jue', num: 21, dot: true,   selected: false, today: false },
+      { name: 'Vie', num: 22, dot: true,   selected: false, today: false },
+      { name: 'Sab', num: 23, dot: false,  selected: false, today: false },
+    ],
+    schedule: [
+      {
+        num: 20, name: 'Mie', active: true,
+        classes: [
+          {
+            time:     '8:00 AM - 1:00 PM',
+            course:   'FORMACIÓN PRÁCTICA EN EMP I',
+            teacher:  'DOCENTE NO ASIGNADO,',
+            location: 'ENTORNO VIRTUAL SV-EV - N/A'
+          },
+          {
+            time:     '2:00 PM - 5:00 PM',
+            course:   'SEMINARIO COMPLEMENT PRÁCT I',
+            teacher:  'UTOS CERAS, LUIS ALBERTO',
+            location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108'
+          },
+          {
+            time:     '6:31 PM - 7:59 PM',
+            course:   'DESARROLLO HUMANO',
+            teacher:  'BALTAZAR VASQUEZ, NICANOR FELIX',
+            location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205'
+          },
+        ]
+      },
+      {
+        num: 21, name: 'Jue', active: false,
+        classes: [
+          {
+            time:     '8:00 AM - 1:00 PM',
+            course:   'FORMACIÓN PRÁCTICA EN EMP I',
+            teacher:  'DOCENTE NO ASIGNADO,',
+            location: 'ENTORNO VIRTUAL SV-EV - N/A'
+          },
+        ]
+      },
+      {
+        num: 22, name: 'Vie', active: false,
+        classes: [
+          {
+            time:     '8:00 AM - 1:00 PM',
+            course:   'FORMACIÓN PRÁCTICA EN EMP I',
+            teacher:  'DOCENTE NO ASIGNADO,',
+            location: 'ENTORNO VIRTUAL SV-EV - N/A'
+          },
+        ]
+      },
+      {
+        num: 23, name: 'Sab', active: false, empty: true,
+        classes: []
+      },
+    ]
   }
+];
+
+/* ─────────────────────────────────────────────────
+   STATE
+───────────────────────────────────────────────── */
+let current = 1; // Empieza en la semana actual (17–23)
+
+/* ─────────────────────────────────────────────────
+   RENDER
+───────────────────────────────────────────────── */
+function renderGrid() {
+  const week = WEEKS[current];
+  document.getElementById('weekGrid').innerHTML = week.days.map(d => `
+    <div class="day-cell">
+      <span class="dc-name">${d.name}</span>
+      <div class="dc-circle ${d.selected ? 'is-selected' : ''}">
+        <span class="dc-num ${d.today && !d.selected ? 'is-today' : ''}">${d.num}</span>
+      </div>
+      <span class="dc-dot ${d.dot ? '' : 'hidden'}"></span>
+    </div>
+  `).join('');
+}
+
+function renderSchedule() {
+  const week = WEEKS[current];
+  document.getElementById('schedule').innerHTML = week.schedule.map(day => {
+    if (day.empty) {
+      return `
+        <div class="day-row">
+          <div class="day-label">
+            <div class="dl-num">${day.num}</div>
+            <div class="dl-abbr">${day.name}</div>
+          </div>
+          <div class="day-empty-line"></div>
+        </div>`;
+    }
+    return `
+      <div class="day-row">
+        <div class="day-label">
+          <div class="dl-num ${day.active ? 'active' : ''}">${day.num}</div>
+          <div class="dl-abbr ${day.active ? 'active' : ''}">${day.name}</div>
+        </div>
+        <div class="day-cards">
+          ${day.classes.map(c => `
+            <div class="class-card">
+              <div class="cc-time">${c.time}</div>
+              <div class="cc-course">${c.course}</div>
+              <div class="cc-teacher">${c.teacher}</div>
+              <div class="cc-location">${c.location}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function render() {
+  renderGrid();
+  renderSchedule();
+}
+
+/* ─────────────────────────────────────────────────
+   SWIPE / DRAG NAVIGATION
+───────────────────────────────────────────────── */
+let startX = 0, isDragging = false;
+
+function navigate(direction) {
+  // direction: -1 = ir atrás (semana anterior), +1 = ir adelante (semana siguiente)
+  const next = current + direction;
+  if (next < 0 || next >= WEEKS.length) return;
+
+  const sched = document.getElementById('schedule');
+  const outClass = direction > 0 ? 'slide-out-left' : 'slide-out-right';
+  const inClass  = direction > 0 ? 'slide-in-left'  : 'slide-in-right';
+
+  sched.classList.add(outClass);
+  setTimeout(() => {
+    sched.classList.remove(outClass);
+    current = next;
+    render();
+    sched.classList.add(inClass);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    setTimeout(() => sched.classList.remove(inClass), 200);
+  }, 180);
+}
+
+// Touch
+document.addEventListener('touchstart', e => {
+  startX = e.touches[0].clientX;
+  isDragging = false;
+}, { passive: true });
+
+document.addEventListener('touchmove', () => { isDragging = true; }, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!isDragging) return;
+  const dx = e.changedTouches[0].clientX - startX;
+  if (Math.abs(dx) > 55) navigate(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+// Mouse (desktop preview)
+document.addEventListener('mousedown', e => { startX = e.clientX; isDragging = false; });
+document.addEventListener('mousemove', () => { isDragging = true; });
+document.addEventListener('mouseup', e => {
+  if (!isDragging) return;
+  const dx = e.clientX - startX;
+  if (Math.abs(dx) > 55) navigate(dx < 0 ? 1 : -1);
+});
+
+/* ─────────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────────── */
+render();
 </script>
 </body>
 </html>
