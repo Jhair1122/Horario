@@ -28,7 +28,7 @@
       color: white;
       display: flex;
       align-items: center;
-      padding: 18px 14px 12px;
+      padding: 18px 14px 14px;
       gap: 12px;
       position: sticky;
       top: 0;
@@ -42,49 +42,28 @@
       display: flex;
       align-items: center;
       padding: 2px;
-      flex-shrink: 0;
+      opacity: 0.92;
     }
-    .header-info { flex: 1; }
     .header-title {
       font-size: 1.22rem;
       font-weight: 600;
       letter-spacing: 0.2px;
     }
-    .header-month {
-      font-size: 0.76rem;
-      color: rgba(255,255,255,0.62);
-      margin-top: 1px;
-      letter-spacing: 0.3px;
-    }
-    /* Today button */
-    .btn-today {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 20px;
-      color: white;
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 5px 12px;
-      cursor: pointer;
-      letter-spacing: 0.3px;
-    }
-    .btn-today:active { background: rgba(255,255,255,0.25); }
 
     /* ══════════════════════════
        WEEK STRIP
     ══════════════════════════ */
     .week-strip {
       background: #2b4a91;
+      padding: 2px 2px 0;
       position: sticky;
       top: 56px;
       z-index: 199;
       user-select: none;
-      touch-action: none; /* capture vertical swipes */
     }
     .week-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      padding: 2px 2px 0;
     }
     .day-cell {
       display: flex;
@@ -92,12 +71,11 @@
       align-items: center;
       padding: 4px 1px 5px;
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
     }
     .dc-name {
       font-size: 0.67rem;
       font-weight: 400;
-      color: rgba(255,255,255,0.50);
+      color: rgba(255,255,255,0.52);
       letter-spacing: 0.2px;
       margin-bottom: 2px;
     }
@@ -111,62 +89,49 @@
       margin-bottom: 4px;
       transition: background 0.15s;
     }
-    .dc-circle.is-selected { background: #4db8ff; }
+    .dc-circle.is-selected {
+      background: #4db8ff;
+    }
     .dc-num {
       font-size: 1.08rem;
       font-weight: 400;
       color: rgba(255,255,255,0.78);
       line-height: 1;
     }
-    .dc-circle.is-selected .dc-num { color: #fff; font-weight: 700; }
-    .dc-num.is-today { color: #4db8ff; }
-    .dc-dot { width: 5px; height: 5px; border-radius: 50%; background: #4db8ff; }
+    .dc-circle.is-selected .dc-num {
+      color: #fff;
+      font-weight: 700;
+    }
+    .dc-num.is-today {
+      color: #4db8ff;
+    }
+    .dc-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #4db8ff;
+    }
     .dc-dot.hidden { visibility: hidden; }
 
-    /* Nav row: Prev | pill | Next */
-    .week-nav {
+    /* pill handle */
+    .week-pill {
       display: flex;
-      align-items: center;
-      padding: 2px 8px 8px;
-      gap: 6px;
+      justify-content: center;
+      padding: 7px 0 9px;
     }
-    .week-nav-btn {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.38);
-      font-size: 0.68rem;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      padding: 4px 6px;
-      border-radius: 8px;
-      letter-spacing: 0.2px;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .week-nav-btn:active { color: rgba(255,255,255,0.75); }
-    .week-pill { flex: 1; display: flex; justify-content: center; }
     .week-pill-bar {
-      width: 34px; height: 3.5px;
+      width: 34px;
+      height: 3.5px;
       border-radius: 3px;
       background: rgba(255,255,255,0.18);
-    }
-
-    /* swipe hint text */
-    .swipe-hint {
-      text-align: center;
-      font-size: 0.6rem;
-      color: rgba(255,255,255,0.22);
-      padding-bottom: 2px;
-      letter-spacing: 0.5px;
     }
 
     /* ══════════════════════════
        SCHEDULE
     ══════════════════════════ */
-    .schedule-wrap { overflow: hidden; }
-    .schedule { padding: 4px 10px 60px; }
+    .schedule {
+      padding: 4px 10px 48px;
+    }
 
     .day-row {
       display: flex;
@@ -174,6 +139,7 @@
       padding: 14px 2px 4px;
       gap: 10px;
     }
+
     .day-label {
       min-width: 48px;
       text-align: center;
@@ -187,44 +153,69 @@
       line-height: 1;
     }
     .dl-num.active { color: #1a7fd4; }
-    .dl-abbr { font-size: 0.75rem; color: #a8b4bf; margin-top: 2px; }
+    .dl-abbr {
+      font-size: 0.75rem;
+      color: #a8b4bf;
+      margin-top: 2px;
+    }
     .dl-abbr.active { color: #1a7fd4; }
 
-    .day-cards { flex: 1; display: flex; flex-direction: column; gap: 9px; }
+    .day-cards {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
     .day-empty-line {
       flex: 1;
       height: 1px;
       background: #ced5de;
       align-self: center;
+      margin-top: 2px;
     }
 
     .class-card {
-      background: #fff;
+      background: #ffffff;
       border-radius: 13px;
       padding: 13px 15px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 0 1px rgba(0,0,0,0.04);
+      box-shadow:
+        0 1px 3px rgba(0,0,0,0.07),
+        0 0 1px rgba(0,0,0,0.04);
     }
-    .cc-time { font-size: 0.92rem; font-weight: 700; color: #17202a; margin-bottom: 3px; }
-    .cc-course { font-size: 0.92rem; font-weight: 700; color: #17202a; margin-bottom: 5px; }
-    .cc-teacher { font-size: 0.8rem; font-weight: 400; color: #6b7c8d; margin-bottom: 2px; }
-    .cc-location { font-size: 0.78rem; color: #6b7c8d; }
+    .cc-time {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #17202a;
+      margin-bottom: 3px;
+    }
+    .cc-course {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #17202a;
+      margin-bottom: 5px;
+    }
+    .cc-teacher {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #6b7c8d;
+      margin-bottom: 2px;
+    }
+    .cc-location {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: #6b7c8d;
+    }
 
-    /* ══════════════════════════
-       ANIMATIONS (vertical)
-    ══════════════════════════ */
-    @keyframes slideUpOut    { to   { opacity:0; transform:translateY(-36px); } }
-    @keyframes slideDownOut  { to   { opacity:0; transform:translateY( 36px); } }
-    @keyframes slideUpIn     { from { opacity:0; transform:translateY( 36px); } to { opacity:1; transform:none; } }
-    @keyframes slideDownIn   { from { opacity:0; transform:translateY(-36px); } to { opacity:1; transform:none; } }
-
-    .anim-up-out    { animation: slideUpOut   0.17s ease forwards; }
-    .anim-down-out  { animation: slideDownOut 0.17s ease forwards; }
-    .anim-up-in     { animation: slideUpIn    0.17s ease forwards; }
-    .anim-down-in   { animation: slideDownIn  0.17s ease forwards; }
-
-    /* week-grid flip */
-    @keyframes gridFadeIn { from { opacity:0; } to { opacity:1; } }
-    .grid-fade { animation: gridFadeIn 0.2s ease; }
+    /* animaciones verticales */
+    .schedule.slide-out-up    { animation: slideOutUp   0.18s ease forwards; }
+    .schedule.slide-out-down  { animation: slideOutDown 0.18s ease forwards; }
+    .schedule.slide-in-up     { animation: slideInUp    0.18s ease forwards; }
+    .schedule.slide-in-down   { animation: slideInDown  0.18s ease forwards; }
+    @keyframes slideOutUp    { to { opacity: 0; transform: translateY(-40px); } }
+    @keyframes slideOutDown  { to { opacity: 0; transform: translateY( 40px); } }
+    @keyframes slideInUp     { from { opacity: 0; transform: translateY( 40px); } to { opacity:1; transform:none; } }
+    @keyframes slideInDown   { from { opacity: 0; transform: translateY(-40px); } to { opacity:1; transform:none; } }
   </style>
 </head>
 <body>
@@ -237,217 +228,166 @@
       <polyline points="15 18 9 12 15 6"/>
     </svg>
   </button>
-  <div class="header-info">
-    <div class="header-title">ClassTimes</div>
-    <div class="header-month" id="headerMonth"></div>
-  </div>
-  <button class="btn-today" id="btnToday">Hoy</button>
+  <span class="header-title">ClassTimes</span>
 </header>
 
 <!-- WEEK STRIP -->
-<div class="week-strip" id="weekStrip">
+<div class="week-strip">
   <div class="week-grid" id="weekGrid"></div>
-  <div class="week-nav">
-    <button class="week-nav-btn" id="btnPrev">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
-      Anterior
-    </button>
-    <div class="week-pill"><div class="week-pill-bar"></div></div>
-    <button class="week-nav-btn" id="btnNext">
-      Siguiente
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
-  </div>
+  <div class="week-pill"><div class="week-pill-bar"></div></div>
 </div>
 
 <!-- SCHEDULE -->
-<div class="schedule-wrap">
-  <div class="schedule" id="schedule"></div>
-</div>
+<div class="schedule" id="schedule"></div>
 
 <script>
-/* ────────────────────────────────────────────────
-   WEEKLY CLASS TEMPLATE
-   (repite cada semana automáticamente)
-──────────────────────────────────────────────── */
-const DAY_NAMES = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
-const MONTH_NAMES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+/* ─────────────────────────────────────────────────
+   PLANTILLA SEMANAL (se repite cada semana)
+───────────────────────────────────────────────── */
+const DAY_NAMES = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
 
 const TEMPLATE = [
   {
-    dayIndex: 1, // Lunes
+    dayIndex: 1,
     classes: [
-      { time: '7:45 AM - 10:00 AM',  course: 'ARTIF INTEL WITH MACH LEAR JAV',  teacher: 'UTOS CERAS, LUIS ALBERTO',         location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
-      { time: '10:15 AM - 12:30 PM', course: 'ARTIF INTEL WITH MACH LEAR JAV',  teacher: 'UTOS CERAS, LUIS ALBERTO',         location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
-      { time: '3:30 PM - 6:30 PM',   course: 'ARTIF INTEL WITH MACH LEAR JAV',  teacher: 'UTOS CERAS, LUIS ALBERTO',         location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
+      { time: '7:45 AM - 10:00 AM',  course: 'ARTIF INTEL WITH MACH LEAR JAV', teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
+      { time: '10:15 AM - 12:30 PM', course: 'ARTIF INTEL WITH MACH LEAR JAV', teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
+      { time: '3:30 PM - 6:30 PM',   course: 'ARTIF INTEL WITH MACH LEAR JAV', teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
     ]
   },
   {
-    dayIndex: 2, // Martes
+    dayIndex: 2,
     classes: [
-      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',      teacher: 'DOCENTE NO ASIGNADO,',             location: 'ENTORNO VIRTUAL SV-EV - N/A' },
-      { time: '2:00 PM - 5:00 PM',   course: 'SEMINARIO COMPLEMENT PRÁCT I',     teacher: 'UTOS CERAS, LUIS ALBERTO',         location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
-      { time: '10:00 PM - 11:00 PM', course: 'REV Y CALIF CUADERNOS INFORME',    teacher: 'UTOS CERAS, LUIS ALBERTO',         location: 'ENTORNO VIRTUAL SV-EV - N/A' },
+      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',   teacher: 'DOCENTE NO ASIGNADO,',            location: 'ENTORNO VIRTUAL SV-EV - N/A' },
+      { time: '2:00 PM - 5:00 PM',   course: 'SEMINARIO COMPLEMENT PRÁCT I',  teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
+      { time: '10:00 PM - 11:00 PM', course: 'REV Y CALIF CUADERNOS INFORME', teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'ENTORNO VIRTUAL SV-EV - N/A' },
     ]
   },
   {
-    dayIndex: 3, // Miércoles
+    dayIndex: 3,
     classes: [
-      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',      teacher: 'DOCENTE NO ASIGNADO,',             location: 'ENTORNO VIRTUAL SV-EV - N/A' },
-      { time: '2:00 PM - 5:00 PM',   course: 'SEMINARIO COMPLEMENT PRÁCT I',     teacher: 'UTOS CERAS, LUIS ALBERTO',         location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
-      { time: '6:31 PM - 7:59 PM',   course: 'DESARROLLO HUMANO',                teacher: 'BALTAZAR VASQUEZ, NICANOR FELIX',  location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205' },
+      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',   teacher: 'DOCENTE NO ASIGNADO,',            location: 'ENTORNO VIRTUAL SV-EV - N/A' },
+      { time: '2:00 PM - 5:00 PM',   course: 'SEMINARIO COMPLEMENT PRÁCT I',  teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
+      { time: '6:31 PM - 7:59 PM',   course: 'DESARROLLO HUMANO',             teacher: 'BALTAZAR VASQUEZ, NICANOR FELIX', location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205' },
     ]
   },
   {
-    dayIndex: 4, // Jueves
+    dayIndex: 4,
     classes: [
-      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',      teacher: 'DOCENTE NO ASIGNADO,',             location: 'ENTORNO VIRTUAL SV-EV - N/A' },
+      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',   teacher: 'DOCENTE NO ASIGNADO,',            location: 'ENTORNO VIRTUAL SV-EV - N/A' },
     ]
   },
   {
-    dayIndex: 5, // Viernes
+    dayIndex: 5,
     classes: [
-      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',      teacher: 'DOCENTE NO ASIGNADO,',             location: 'ENTORNO VIRTUAL SV-EV - N/A' },
+      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',   teacher: 'DOCENTE NO ASIGNADO,',            location: 'ENTORNO VIRTUAL SV-EV - N/A' },
     ]
   },
-  // Sábado y Domingo: sin clases → se muestran como línea vacía
 ];
 
-/* días que tienen clases (para punto azul) */
 const DAYS_WITH_CLASSES = new Set(TEMPLATE.map(t => t.dayIndex));
 
-/* ────────────────────────────────────────────────
-   GENERACIÓN DE SEMANAS (52 semanas automáticas)
-──────────────────────────────────────────────── */
-// Semana de referencia: Dom 10 May 2026
-const EPOCH_SUNDAY = new Date(2026, 4, 10);
-EPOCH_SUNDAY.setHours(0, 0, 0, 0);
+/* ─────────────────────────────────────────────────
+   GENERACIÓN DE SEMANAS
+───────────────────────────────────────────────── */
+const EPOCH = new Date(2026, 4, 10); // Dom 10 May 2026
+EPOCH.setHours(0,0,0,0);
 const TOTAL_WEEKS = 52;
 
-const todayDate = new Date();
-todayDate.setHours(0, 0, 0, 0);
+const today = new Date();
+today.setHours(0,0,0,0);
 
 function addDays(base, n) {
   const d = new Date(base);
-  d.setDate(base.getDate() + n);
+  d.setDate(d.getDate() + n);
   return d;
 }
 
-function weekIndex(sunday) {
-  return Math.round((sunday.getTime() - EPOCH_SUNDAY.getTime()) / (7 * 86400000));
-}
-
-function getWeekSunday(idx) {
-  return addDays(EPOCH_SUNDAY, idx * 7);
-}
-
 function getCurrentWeekIdx() {
-  const dayOfWeek = todayDate.getDay();
-  const todaySunday = addDays(todayDate, -dayOfWeek);
-  todaySunday.setHours(0, 0, 0, 0);
-  const idx = weekIndex(todaySunday);
+  const sun = addDays(today, -today.getDay());
+  sun.setHours(0,0,0,0);
+  const idx = Math.round((sun - EPOCH) / (7 * 86400000));
   return Math.max(0, Math.min(TOTAL_WEEKS - 1, idx));
 }
 
 function buildWeek(weekIdx) {
-  const sunday = getWeekSunday(weekIdx);
+  const sunday = addDays(EPOCH, weekIdx * 7);
 
   const days = Array.from({ length: 7 }, (_, d) => {
     const date = addDays(sunday, d);
-    date.setHours(0, 0, 0, 0);
+    date.setHours(0,0,0,0);
     return {
       name: DAY_NAMES[d],
       num: date.getDate(),
-      date,
       dot: DAYS_WITH_CLASSES.has(d),
-      isToday: date.getTime() === todayDate.getTime(),
+      isToday: date.getTime() === today.getTime(),
     };
   });
 
-  // Filas del horario: Lun–Vie con clases, Dom y Sab como vacíos
-  const scheduleRows = [];
+  // El día activo/seleccionado: hoy si estamos en la semana actual, si no el Lunes
+  const isCurrentWeek = weekIdx === getCurrentWeekIdx();
+  const selectedDay = isCurrentWeek ? today.getDay() : 1;
 
-  // Domingo (vacío)
-  scheduleRows.push({ dayIndex: 0, name: 'Dom', num: days[0].num, classes: [], empty: true });
-
-  // Días de la plantilla
-  for (const t of TEMPLATE) {
+  const schedule = TEMPLATE.map(t => {
     const date = addDays(sunday, t.dayIndex);
-    scheduleRows.push({
+    return {
       dayIndex: t.dayIndex,
       name: DAY_NAMES[t.dayIndex],
       num: date.getDate(),
       classes: t.classes,
-      empty: false,
-    });
-  }
+      active: t.dayIndex === selectedDay,
+    };
+  });
 
-  // Sábado (vacío)
-  scheduleRows.push({ dayIndex: 6, name: 'Sab', num: days[6].num, classes: [], empty: true });
+  // Sábado vacío
+  const sat = addDays(sunday, 6);
+  schedule.push({ dayIndex: 6, name: 'Sab', num: sat.getDate(), classes: [], empty: true });
 
-  return { days, scheduleRows, sunday };
+  return { days, schedule, selectedDay };
 }
 
-/* ────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────
    ESTADO
-──────────────────────────────────────────────── */
-let currentWeekIdx = getCurrentWeekIdx();
-let selectedDayIndex = todayDate.getDay(); // 0–6
+───────────────────────────────────────────────── */
+let current = getCurrentWeekIdx();
 
-/* ────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────
    RENDER
-──────────────────────────────────────────────── */
-function getMonthLabel(week) {
-  const mon = week.days[1].date;
-  const fri = week.days[5].date;
-  if (mon.getMonth() === fri.getMonth()) {
-    return `${MONTH_NAMES[mon.getMonth()]} ${mon.getFullYear()}`;
-  }
-  return `${MONTH_NAMES[mon.getMonth()]} – ${MONTH_NAMES[fri.getMonth()]} ${fri.getFullYear()}`;
-}
-
-function renderGrid(week, animate) {
-  document.getElementById('headerMonth').textContent = getMonthLabel(week);
-  const grid = document.getElementById('weekGrid');
-  grid.innerHTML = week.days.map((d, i) => `
-    <div class="day-cell" onclick="selectDay(${i})">
+───────────────────────────────────────────────── */
+function renderGrid() {
+  const { days, selectedDay } = buildWeek(current);
+  document.getElementById('weekGrid').innerHTML = days.map((d, i) => `
+    <div class="day-cell">
       <span class="dc-name">${d.name}</span>
-      <div class="dc-circle ${i === selectedDayIndex ? 'is-selected' : ''}">
-        <span class="dc-num ${d.isToday && i !== selectedDayIndex ? 'is-today' : ''}">${d.num}</span>
+      <div class="dc-circle ${i === selectedDay ? 'is-selected' : ''}">
+        <span class="dc-num ${d.isToday && i !== selectedDay ? 'is-today' : ''}">${d.num}</span>
       </div>
       <span class="dc-dot ${d.dot ? '' : 'hidden'}"></span>
     </div>
   `).join('');
-  if (animate) {
-    grid.classList.remove('grid-fade');
-    void grid.offsetWidth;
-    grid.classList.add('grid-fade');
-  }
 }
 
-function renderSchedule(week) {
-  document.getElementById('schedule').innerHTML = week.scheduleRows.map(row => {
-    if (row.empty) {
+function renderSchedule() {
+  const { schedule } = buildWeek(current);
+  document.getElementById('schedule').innerHTML = schedule.map(day => {
+    if (day.empty) {
       return `
         <div class="day-row">
           <div class="day-label">
-            <div class="dl-num">${row.num}</div>
-            <div class="dl-abbr">${row.name}</div>
+            <div class="dl-num">${day.num}</div>
+            <div class="dl-abbr">${day.name}</div>
           </div>
           <div class="day-empty-line"></div>
         </div>`;
     }
-    const isActive = row.dayIndex === selectedDayIndex;
     return `
-      <div class="day-row" id="sched-day-${row.dayIndex}">
+      <div class="day-row">
         <div class="day-label">
-          <div class="dl-num ${isActive ? 'active' : ''}">${row.num}</div>
-          <div class="dl-abbr ${isActive ? 'active' : ''}">${row.name}</div>
+          <div class="dl-num ${day.active ? 'active' : ''}">${day.num}</div>
+          <div class="dl-abbr ${day.active ? 'active' : ''}">${day.name}</div>
         </div>
         <div class="day-cards">
-          ${row.classes.map(c => `
+          ${day.classes.map(c => `
             <div class="class-card">
               <div class="cc-time">${c.time}</div>
               <div class="cc-course">${c.course}</div>
@@ -460,125 +400,81 @@ function renderSchedule(week) {
   }).join('');
 }
 
-function render(animateGrid) {
-  const week = buildWeek(currentWeekIdx);
-  renderGrid(week, animateGrid);
-  renderSchedule(week);
+function render() {
+  renderGrid();
+  renderSchedule();
 }
 
-/* ────────────────────────────────────────────────
-   SELECCIÓN DE DÍA
-──────────────────────────────────────────────── */
-function selectDay(dayIndex) {
-  selectedDayIndex = dayIndex;
-  render(false);
-  // scroll suave al día
-  const el = document.getElementById(`sched-day-${dayIndex}`);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-/* ────────────────────────────────────────────────
-   NAVEGACIÓN DE SEMANAS
-──────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────
+   NAVEGACIÓN
+───────────────────────────────────────────────── */
 let isAnimating = false;
 
 function navigate(direction) {
-  // direction: +1 = semana siguiente (deslizar arriba)
-  //            -1 = semana anterior  (deslizar abajo)
+  // +1 = semana siguiente, -1 = semana anterior
   if (isAnimating) return;
-  const next = currentWeekIdx + direction;
+  const next = current + direction;
   if (next < 0 || next >= TOTAL_WEEKS) return;
 
   isAnimating = true;
   const sched = document.getElementById('schedule');
-  const outClass = direction > 0 ? 'anim-up-out'   : 'anim-down-out';
-  const inClass  = direction > 0 ? 'anim-up-in'    : 'anim-down-in';
+  const outClass = direction > 0 ? 'slide-out-up'   : 'slide-out-down';
+  const inClass  = direction > 0 ? 'slide-in-up'    : 'slide-in-down';
 
   sched.classList.add(outClass);
-
   setTimeout(() => {
     sched.classList.remove(outClass);
-    currentWeekIdx = next;
-    render(true);
+    current = next;
+    render();
     sched.classList.add(inClass);
     window.scrollTo({ top: 0, behavior: 'instant' });
     setTimeout(() => {
       sched.classList.remove(inClass);
       isAnimating = false;
     }, 200);
-  }, 170);
+  }, 180);
 }
 
-// Botones Anterior / Siguiente
-document.getElementById('btnPrev').addEventListener('click', () => navigate(-1));
-document.getElementById('btnNext').addEventListener('click', () => navigate(+1));
-
-// Botón Hoy
-document.getElementById('btnToday').addEventListener('click', () => {
-  const todayWeek = getCurrentWeekIdx();
-  if (todayWeek === currentWeekIdx) return;
-  const dir = todayWeek > currentWeekIdx ? 1 : -1;
-  // Navegar directamente sin animar múltiples veces
-  isAnimating = false;
-  currentWeekIdx = todayWeek;
-  selectedDayIndex = todayDate.getDay();
-  render(true);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-/* ────────────────────────────────────────────────
-   SWIPE TÁCTIL
-   • Week strip: deslizar ↑ = semana siguiente
-                 deslizar ↓ = semana anterior
-   • Resto de pantalla: deslizar ← = siguiente
-                        deslizar → = anterior
-──────────────────────────────────────────────── */
-const weekStrip = document.getElementById('weekStrip');
-let wsX0 = 0, wsY0 = 0;
-
-weekStrip.addEventListener('touchstart', e => {
-  wsX0 = e.touches[0].clientX;
-  wsY0 = e.touches[0].clientY;
-}, { passive: true });
-
-weekStrip.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - wsX0;
-  const dy = e.changedTouches[0].clientY - wsY0;
-
-  if (Math.abs(dy) > Math.abs(dx)) {
-    // Swipe vertical dominante
-    if (Math.abs(dy) > 25) navigate(dy < 0 ? +1 : -1);
-  } else {
-    // Swipe horizontal
-    if (Math.abs(dx) > 40) navigate(dx < 0 ? +1 : -1);
-  }
-}, { passive: true });
-
-// Swipe horizontal en el resto de la pantalla
-let bodyX0 = 0, bodyY0 = 0, bodyMoved = false;
+/* ─────────────────────────────────────────────────
+   TOUCH — deslizar arriba = siguiente, abajo = anterior
+───────────────────────────────────────────────── */
+let startX = 0, startY = 0, moved = false;
 
 document.addEventListener('touchstart', e => {
-  if (weekStrip.contains(e.target)) return;
-  bodyX0 = e.touches[0].clientX;
-  bodyY0 = e.touches[0].clientY;
-  bodyMoved = false;
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  moved  = false;
 }, { passive: true });
 
-document.addEventListener('touchmove', () => { bodyMoved = true; }, { passive: true });
+document.addEventListener('touchmove', () => { moved = true; }, { passive: true });
 
 document.addEventListener('touchend', e => {
-  if (weekStrip.contains(e.target) || !bodyMoved) return;
-  const dx = e.changedTouches[0].clientX - bodyX0;
-  const dy = e.changedTouches[0].clientY - bodyY0;
-  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 55) {
-    navigate(dx < 0 ? +1 : -1);
+  if (!moved) return;
+  const dx = e.changedTouches[0].clientX - startX;
+  const dy = e.changedTouches[0].clientY - startY;
+  // Solo activar si el gesto es principalmente vertical
+  if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
+    navigate(dy < 0 ? +1 : -1);
   }
 }, { passive: true });
 
-/* ────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────
+   RUEDA DEL MOUSE — bajar = siguiente, subir = anterior
+───────────────────────────────────────────────── */
+let wheelCooldown = false;
+
+document.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (wheelCooldown) return;
+  wheelCooldown = true;
+  setTimeout(() => { wheelCooldown = false; }, 400);
+  navigate(e.deltaY > 0 ? +1 : -1);
+}, { passive: false });
+
+/* ─────────────────────────────────────────────────
    INIT
-──────────────────────────────────────────────── */
-render(false);
+───────────────────────────────────────────────── */
+render();
 </script>
 </body>
 </html>
