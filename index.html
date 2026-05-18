@@ -2,393 +2,463 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#2b4a91">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>ClassTimes</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      background: #f2f4f8;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      max-width: 500px;
+    html, body {
+      background: #edf0f6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Noto Sans', sans-serif;
+      color: #17202a;
+      max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* Header exacto como en imagen */
-    .app-header {
+    /* HEADER */
+    .header {
       background: #2b4a91;
-      padding: 14px 16px;
+      color: white;
       display: flex;
       align-items: center;
+      padding: 18px 14px 14px;
       gap: 12px;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 200;
     }
-    .back-btn {
+    .btn-back {
       background: none;
       border: none;
       color: white;
-      font-size: 1.8rem;
-      line-height: 1;
       cursor: pointer;
-      padding: 0 4px;
-      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      padding: 2px;
+      opacity: 0.92;
     }
     .header-title {
-      color: white;
-      font-size: 1.35rem;
+      font-size: 1.22rem;
       font-weight: 600;
-      letter-spacing: -0.2px;
+      letter-spacing: 0.2px;
     }
 
-    /* Week strip (calendario) */
+    /* WEEK STRIP (calendario azul) */
     .week-strip {
       background: #2b4a91;
-      padding: 6px 0 0 0;
+      padding: 2px 2px 0;
       position: sticky;
       top: 56px;
-      z-index: 99;
+      z-index: 199;
+      user-select: none;
     }
     .week-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      text-align: center;
     }
     .day-cell {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 6px 0 8px;
+      padding: 4px 1px 5px;
+      cursor: pointer;
     }
-    .day-name {
-      font-size: 0.7rem;
+    .dc-name {
+      font-size: 0.67rem;
       font-weight: 400;
-      color: rgba(255,255,255,0.65);
-      text-transform: uppercase;
-      margin-bottom: 4px;
+      color: rgba(255,255,255,0.52);
+      letter-spacing: 0.2px;
+      margin-bottom: 2px;
     }
-    .day-circle {
-      width: 38px;
-      height: 38px;
+    .dc-circle {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: transparent;
-      transition: background 0.2s;
+      margin-bottom: 4px;
+      transition: background 0.15s;
     }
-    .day-circle.active {
+    .dc-circle.is-selected {
       background: #4db8ff;
     }
-    .day-number {
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: rgba(255,255,255,0.85);
+    .dc-num {
+      font-size: 1.08rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.78);
+      line-height: 1;
     }
-    .day-circle.active .day-number {
-      color: white;
+    .dc-circle.is-selected .dc-num {
+      color: #fff;
       font-weight: 700;
     }
     .week-pill {
       display: flex;
       justify-content: center;
-      padding: 6px 0 8px;
+      padding: 7px 0 9px;
     }
-    .pill-bar {
-      width: 32px;
-      height: 3px;
-      background: rgba(255,255,255,0.25);
-      border-radius: 10px;
-    }
-
-    /* Contenedor del contenido (exacto a las imágenes) */
-    .content-container {
-      padding: 12px 14px 40px;
+    .week-pill-bar {
+      width: 34px;
+      height: 3.5px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.18);
     }
 
-    /* Lista con guiones (como en la imagen 3875) */
-    .days-list {
-      margin-bottom: 1.5rem;
+    /* SCHEDULE (tarjetas) */
+    .schedule {
+      padding: 4px 10px 48px;
     }
-    .day-group {
-      margin-bottom: 0.8rem;
+    .day-row {
+      display: flex;
+      align-items: flex-start;
+      padding: 14px 2px 4px;
+      gap: 10px;
     }
-    .day-heading {
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 0.2rem;
+    .day-label {
+      min-width: 48px;
+      text-align: center;
+      flex-shrink: 0;
+      padding-top: 1px;
     }
-    .day-numbers {
-      margin-left: 1.2rem;
-      list-style: none;
+    .dl-num {
+      font-size: 2.05rem;
+      font-weight: 300;
+      color: #a8b4bf;
+      line-height: 1;
     }
-    .day-numbers li {
-      font-size: 1rem;
-      margin-bottom: 0.1rem;
-      position: relative;
+    .dl-abbr {
+      font-size: 0.75rem;
+      color: #a8b4bf;
+      margin-top: 2px;
     }
-    .day-numbers li::before {
-      content: "- ";
-      position: absolute;
-      left: -1rem;
+    .day-cards {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
     }
-
-    /* Bloques de horario (igual que en 3875) */
-    .schedule-block {
-      margin-bottom: 1.5rem;
+    .class-card {
+      background: #ffffff;
+      border-radius: 13px;
+      padding: 13px 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 0 1px rgba(0,0,0,0.04);
     }
-    .block-day {
-      font-weight: 700;
-      font-size: 1rem;
-      margin: 0.2rem 0;
-    }
-    .block-time {
-      font-weight: 700;
-      font-size: 0.95rem;
-      margin: 0.2rem 0;
-    }
-    .course-name {
-      font-weight: 700;
-      font-size: 1rem;
-      margin: 0.4rem 0 0.1rem;
-    }
-    .teacher-name {
+    .cc-time {
       font-size: 0.92rem;
-      margin: 0.1rem 0;
+      font-weight: 700;
+      color: #17202a;
+      margin-bottom: 3px;
     }
-    .location {
-      font-size: 0.88rem;
-      color: #4a6272;
-      margin-top: 0.2rem;
+    .cc-course {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #17202a;
+      margin-bottom: 5px;
+    }
+    .cc-teacher {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #6b7c8d;
+      margin-bottom: 2px;
+    }
+    .cc-location {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: #6b7c8d;
     }
 
-    /* Línea divisoria (--- en las imágenes) */
-    .divider {
-      margin: 1rem 0;
-      border: none;
-      height: 1px;
-      background: #cbd5e1;
-    }
+    /* animaciones */
+    .schedule.slide-out-up    { animation: slideOutUp   0.18s ease forwards; }
+    .schedule.slide-out-down  { animation: slideOutDown 0.18s ease forwards; }
+    .schedule.slide-in-up     { animation: slideInUp    0.18s ease forwards; }
+    .schedule.slide-in-down   { animation: slideInDown  0.18s ease forwards; }
+    @keyframes slideOutUp    { to { opacity: 0; transform: translateY(-40px); } }
+    @keyframes slideOutDown  { to { opacity: 0; transform: translateY( 40px); } }
+    @keyframes slideInUp     { from { opacity: 0; transform: translateY( 40px); } to { opacity:1; transform:none; } }
+    @keyframes slideInDown   { from { opacity: 0; transform: translateY(-40px); } to { opacity:1; transform:none; } }
   </style>
 </head>
 <body>
 
-<header class="app-header">
-  <button class="back-btn" id="backBtn">‹</button>
+<header class="header">
+  <button class="btn-back" id="backBtn" aria-label="Volver">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+         stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  </button>
   <span class="header-title">ClassTimes</span>
 </header>
 
 <div class="week-strip">
   <div class="week-grid" id="weekGrid"></div>
-  <div class="week-pill"><div class="pill-bar"></div></div>
+  <div class="week-pill"><div class="week-pill-bar"></div></div>
 </div>
 
-<div class="content-container" id="contentContainer"></div>
+<div class="schedule" id="schedule"></div>
 
 <script>
-  // =========================================================================
-  // CONTENIDO EXACTO DE LAS IMÁGENES (3875.jpg, 0627.jpg, 3833.jpg)
-  // Cada semana respeta fielmente los textos, guiones y bloques.
-  // =========================================================================
+  // ============================================================
+  // DATOS EXACTOS DE LAS TRES IMÁGENES (3875, 0627, 3833)
+  // Cada semana contiene:
+  //   - fechaInicio: domingo de esa semana (fecha real)
+  //   - items: lista de objetos que representan filas del horario.
+  //            Cada item tiene: dayIndex (0=Dom..6=Sab), numDia (número del día),
+  //            y opcionalmente un array 'classes' (mismo formato que TEMPLATE)
+  // ============================================================
 
-  // Semana 1: basada en 3875.jpg (semana del domingo 17 de mayo de 2026)
+  // Semana 1: basada en 3875.jpg (domingo 17 de mayo de 2026)
   const semana3875 = {
-    fechaInicio: new Date(2026, 4, 17), // domingo 17 mayo
-    // Días con listas de números (como aparece en la imagen)
-    listasDias: [
-      { nombre: "Dom", numeros: [17, 18, 19, 20] }
-    ],
-    // Bloques de horarios
-    bloques: [
-      { dia: "Lun", hora: "10:00 PM - 11:00 PM", curso: "REV Y CALIF CUADERNOS INFORME", profesor: "UTOS CERAS, LUIS ALBERTO", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" },
-      { dia: "Mié", hora: "8:00 AM - 1:00 PM", curso: "FORMACIÓN PRÁCTICA EN EMP I", profesor: "DOCENTE NO ASIGNADO,", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" },
-      { dia: "Mié", hora: "2:00 PM - 5:00 PM", curso: "SEMINARIO COMPLEMENT PRÁCT I", profesor: "UTOS CERAS, LUIS ALBERTO", ubicacion: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-      { dia: "Mié", hora: "6:31 PM - 7:59 PM", curso: "DESARROLLO HUMANO", profesor: "BALTAZAR VASQUEZ, NICANOR FELIX", ubicacion: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205" },
-      { dia: "Mié", hora: "8:00 AM - 1:00 PM", curso: "FORMACIÓN PRÁCTICA EN EMP I", profesor: "DOCENTE NO ASIGNADO,", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" },
-      { dia: "Mié", hora: "8:00 AM - 1:00 PM", curso: "FORMACIÓN PRÁCTICA EN EMP I", profesor: "DOCENTE NO ASIGNADO,", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" }
+    fechaInicio: new Date(2026, 4, 17), // 17 mayo 2026
+    items: [
+      // Dom: números 17,18,19,20 (sin clases)
+      { dayIndex: 0, numDia: 17, classes: [] },
+      { dayIndex: 0, numDia: 18, classes: [] },
+      { dayIndex: 0, numDia: 19, classes: [] },
+      { dayIndex: 0, numDia: 20, classes: [] },
+      // Lun: bloque con clase
+      { dayIndex: 1, numDia: 18, classes: [{ time: "10:00 PM - 11:00 PM", course: "REV Y CALIF CUADERNOS INFORME", teacher: "UTOS CERAS, LUIS ALBERTO", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
+      // Mié: múltiples bloques (fecha real: 20 de mayo)
+      { dayIndex: 3, numDia: 20, classes: [
+        { time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMP I", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" },
+        { time: "2:00 PM - 5:00 PM", course: "SEMINARIO COMPLEMENT PRÁCT I", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
+        { time: "6:31 PM - 7:59 PM", course: "DESARROLLO HUMANO", teacher: "BALTAZAR VASQUEZ, NICANOR FELIX", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205" },
+        { time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMP I", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" },
+        { time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMP I", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }
+      ] }
     ]
   };
 
-  // Semana 2: basada en 0627.jpg (semana del domingo 10 de mayo de 2026)
+  // Semana 2: basada en 0627.jpg (domingo 10 de mayo de 2026)
   const semana0627 = {
-    fechaInicio: new Date(2026, 4, 10), // domingo 10 mayo
-    listasDias: [
-      { nombre: "Dom", numeros: [10, 11] },
-      { nombre: "Lun", numeros: [11, 12] },
-      { nombre: "Mar", numeros: [12, 13] },
-      { nombre: "Mie", numeros: [13, 14] },
-      { nombre: "Jue", numeros: [14, 15] },
-      { nombre: "Vie", numeros: [15, 16] }
-    ],
-    bloques: [
-      { hora: "7:45 AM - 10:00 AM", curso: "ARTIF INTEL WITH MACH LEAR JAV", profesor: "UTOS CERAS, LUIS ALBERTO", ubicacion: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-      { hora: "10:15 AM - 12:30 PM", curso: "ARTIF INTEL WITH MACH LEAR JAV", profesor: "UTOS CERAS, LUIS ALBERTO", ubicacion: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-      { hora: "3:30 PM - 6:30 PM", curso: "ARTIF INTEL WITH MACH LEAR JAV", profesor: "UTOS CERAS, LUIS ALBERTO", ubicacion: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-      { hora: "8:00 AM - 1:00 PM", curso: "FORMACIÓN PRÁCTICA EN EMPI", profesor: "DOCENTE NO ASIGNADO,", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" },
-      { hora: "2:00 PM - 5:00 PM", curso: "SEMINARIO COMPLEMENT PRÁCTI", profesor: "UTOS CERAS, LUIS ALBERTO", ubicacion: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-      { hora: "10:00 PM - 11:00 PM", curso: "REV Y CALIF CUADERNOS INFORME", profesor: "UTOS CERAS, LUIS ALBERTO", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" },
-      { hora: "8:00 AM - 1:00 PM", curso: "FORMACIÓN PRÁCTICA EN EMPI", profesor: "DOCENTE NO ASIGNADO" }  // sin ubicación
+    fechaInicio: new Date(2026, 4, 10), // 10 mayo 2026
+    items: [
+      // Dom: 10,11
+      { dayIndex: 0, numDia: 10, classes: [] },
+      { dayIndex: 0, numDia: 11, classes: [] },
+      // Lun: 11,12
+      { dayIndex: 1, numDia: 11, classes: [] },
+      { dayIndex: 1, numDia: 12, classes: [] },
+      // Mar: 12,13
+      { dayIndex: 2, numDia: 12, classes: [] },
+      { dayIndex: 2, numDia: 13, classes: [] },
+      // Mie: 13,14
+      { dayIndex: 3, numDia: 13, classes: [] },
+      { dayIndex: 3, numDia: 14, classes: [] },
+      // Jue: 14,15
+      { dayIndex: 4, numDia: 14, classes: [] },
+      { dayIndex: 4, numDia: 15, classes: [] },
+      // Vie: 15,16
+      { dayIndex: 5, numDia: 15, classes: [] },
+      { dayIndex: 5, numDia: 16, classes: [] },
+      // Bloques de clases (sin día explícito en la imagen, los asociamos a las fechas correspondientes)
+      // 7:45 AM - 10:00 AM (lunes 11)
+      { dayIndex: 1, numDia: 11, classes: [{ time: "7:45 AM - 10:00 AM", course: "ARTIF INTEL WITH MACH LEAR JAV", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
+      // 10:15 AM - 12:30 PM (lunes 11)
+      { dayIndex: 1, numDia: 11, classes: [{ time: "10:15 AM - 12:30 PM", course: "ARTIF INTEL WITH MACH LEAR JAV", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
+      // 3:30 PM - 6:30 PM (lunes 11)
+      { dayIndex: 1, numDia: 11, classes: [{ time: "3:30 PM - 6:30 PM", course: "ARTIF INTEL WITH MACH LEAR JAV", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
+      // 8:00 AM - 1:00 PM (martes 12)
+      { dayIndex: 2, numDia: 12, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
+      // 2:00 PM - 5:00 PM (martes 12)
+      { dayIndex: 2, numDia: 12, classes: [{ time: "2:00 PM - 5:00 PM", course: "SEMINARIO COMPLEMENT PRÁCTI", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
+      // 10:00 PM - 11:00 PM (martes 12)
+      { dayIndex: 2, numDia: 12, classes: [{ time: "10:00 PM - 11:00 PM", course: "REV Y CALIF CUADERNOS INFORME", teacher: "UTOS CERAS, LUIS ALBERTO", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
+      // 8:00 AM - 1:00 PM (último, sin ubicación) - lo asociamos al miércoles 13
+      { dayIndex: 3, numDia: 13, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO", location: "" }] }
     ]
   };
 
-  // Semana 3: basada en 3833.jpg (semana del domingo 17 de mayo de 2026 - otra vista)
+  // Semana 3: basada en 3833.jpg (domingo 17 de mayo de 2026)
   const semana3833 = {
-    fechaInicio: new Date(2026, 4, 17), // domingo 17 mayo
-    listasDias: [
-      { nombre: "Dom", numeros: [17, 18] },
-      { nombre: "Lun", numeros: [19] },
-      { nombre: "Mar", numeros: [20] },
-      { nombre: "Mie", numeros: [21] },
-      { nombre: "Jue", numeros: [22] },
-      { nombre: "Vie", numeros: [23] }
-    ],
-    bloques: [
-      { numero: "20", dia: "Mie", hora: "8:00 AM - 1:00 PM", curso: "FORMACIÓN PRÁCTICA EN EMPI", profesor: "DOCENTE NO ASIGNADO,", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" },
-      { hora: "2:00 PM - 5:00 PM", curso: "SEMINARIO COMPLEMENT PRÁCTI", profesor: "UTOS CERAS, LUIS ALBERTO", ubicacion: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-      { hora: "6:31 PM - 7:59 PM", curso: "DESARROLLO HUMANO", profesor: "BALTZAR VASQUEZ, NICANOR FELIX", ubicacion: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205" },
-      { hora: "8:00 AM - 1:00 PM", curso: "FORMACIÓN PRÁCTICA EN EMPI", profesor: "DOCENTE NO ASIGNADO,", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" },
-      { hora: "8:00 AM - 1:00 PM", curso: "FORMACIÓN PRÁCTICA EN EMPI", profesor: "DOCENTE NO ASIGNADO,", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" },
-      { numero: "22", dia: "Vie", hora: "8:00 AM - 1:00 PM", curso: "FORMACIÓN PRÁCTICA EN EMPI", profesor: "DOCENTE NO ASIGNADO,", ubicacion: "ENTORNO VIRTUAL SV-EV - N/A" }
+    fechaInicio: new Date(2026, 4, 17), // 17 mayo 2026
+    items: [
+      // Dom: 17,18
+      { dayIndex: 0, numDia: 17, classes: [] },
+      { dayIndex: 0, numDia: 18, classes: [] },
+      // Lun: 19
+      { dayIndex: 1, numDia: 19, classes: [] },
+      // Mar: 20
+      { dayIndex: 2, numDia: 20, classes: [] },
+      // Mie: 21
+      { dayIndex: 3, numDia: 21, classes: [] },
+      // Jue: 22
+      { dayIndex: 4, numDia: 22, classes: [] },
+      // Vie: 23
+      { dayIndex: 5, numDia: 23, classes: [] },
+      // Bloque: 20 - Mie (20 de mayo)
+      { dayIndex: 3, numDia: 20, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
+      // Bloque: 2:00 PM - 5:00 PM (sin número, lo asociamos al miércoles 20)
+      { dayIndex: 3, numDia: 20, classes: [{ time: "2:00 PM - 5:00 PM", course: "SEMINARIO COMPLEMENT PRÁCTI", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
+      // Bloque: 6:31 PM - 7:59 PM (miércoles 20)
+      { dayIndex: 3, numDia: 20, classes: [{ time: "6:31 PM - 7:59 PM", course: "DESARROLLO HUMANO", teacher: "BALTZAR VASQUEZ, NICANOR FELIX", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205" }] },
+      // Bloque: 8:00 AM - 1:00 PM (dos veces, miércoles 20)
+      { dayIndex: 3, numDia: 20, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
+      { dayIndex: 3, numDia: 20, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
+      // Bloque: 22 - Vie (22 de mayo)
+      { dayIndex: 5, numDia: 22, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] }
     ]
   };
 
   const semanas = [semana3875, semana0627, semana3833];
-  let currentIndex = 0;
+  let currentIndex = 0;  // 0 = 3875, 1 = 0627, 2 = 3833
+  let isAnimating = false;
+  const DAY_NAMES = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
 
-  // Helper: obtener fecha de un día específico de la semana (0 = domingo)
-  function getDayDate(fechaInicio, dayIndex) {
-    const d = new Date(fechaInicio);
-    d.setDate(fechaInicio.getDate() + dayIndex);
-    return d;
-  }
-
-  // Renderizar el week strip (calendario azul) con las fechas reales
+  // ------------------------------------------------------------
+  // Renderiza el week strip (calendario azul) con las fechas reales
+  // ------------------------------------------------------------
   function renderWeekStrip() {
     const semana = semanas[currentIndex];
     const inicio = semana.fechaInicio;
-    const diasSemana = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
-    const grid = document.getElementById("weekGrid");
+    const grid = document.getElementById('weekGrid');
     if (!grid) return;
 
-    // Determinar qué día tiene el círculo azul: lunes (índice 1) o el primer día con bloque
-    let activeIndex = 1; // lunes por defecto
-    // Para la semana 3875, el primer bloque es "Lun", así que activamos lunes
-    // Para las demás también activamos lunes
-    if (currentIndex === 2) activeIndex = 1; // semana3833 también lunes
+    // Días de la semana (0..6)
+    const daysArray = [];
+    for (let i = 0; i < 7; i++) {
+      const fecha = new Date(inicio);
+      fecha.setDate(inicio.getDate() + i);
+      daysArray.push({ name: DAY_NAMES[i], num: fecha.getDate() });
+    }
 
-    grid.innerHTML = diasSemana.map((name, idx) => {
-      const fecha = getDayDate(inicio, idx);
-      const numDia = fecha.getDate();
-      const isActive = (idx === activeIndex);
-      return `
-        <div class="day-cell">
-          <span class="day-name">${name}</span>
-          <div class="day-circle ${isActive ? 'active' : ''}">
-            <span class="day-number">${numDia}</span>
-          </div>
+    // El día seleccionado (círculo azul) siempre será el lunes (índice 1)
+    const selectedIdx = 1;
+
+    grid.innerHTML = daysArray.map((d, idx) => `
+      <div class="day-cell">
+        <span class="dc-name">${d.name}</span>
+        <div class="dc-circle ${idx === selectedIdx ? 'is-selected' : ''}">
+          <span class="dc-num">${d.num}</span>
         </div>
-      `;
-    }).join("");
+      </div>
+    `).join('');
   }
 
-  // Renderizar el contenido exacto (lista con guiones + bloques)
-  function renderContent() {
-    const container = document.getElementById("contentContainer");
-    if (!container) return;
+  // ------------------------------------------------------------
+  // Renderiza el horario (schedule) a partir de los items de la semana actual
+  // ------------------------------------------------------------
+  function renderSchedule() {
     const semana = semanas[currentIndex];
-    let html = "";
+    const container = document.getElementById('schedule');
+    if (!container) return;
 
-    // 1. Mostrar los días con sus números con guiones (si existen)
-    if (semana.listasDias && semana.listasDias.length) {
-      html += `<div class="days-list">`;
-      for (let grupo of semana.listasDias) {
-        html += `<div class="day-group">
-          <div class="day-heading">${grupo.nombre}</div>
-          <ul class="day-numbers">`;
-        grupo.numeros.forEach(num => {
-          html += `<li>${num}</li>`;
-        });
-        html += `</ul></div>`;
+    // Agrupar los items por (dayIndex, numDia) y acumular las clases.
+    // Usamos un Map con clave "dayIndex|numDia"
+    const map = new Map();
+    for (const item of semana.items) {
+      const key = `${item.dayIndex}|${item.numDia}`;
+      if (!map.has(key)) {
+        map.set(key, { dayIndex: item.dayIndex, numDia: item.numDia, classes: [] });
       }
-      html += `</div>`;
-      // Línea divisoria "---" como en las imágenes
-      html += `<hr class="divider">`;
+      if (item.classes && item.classes.length) {
+        map.get(key).classes.push(...item.classes);
+      }
     }
 
-    // 2. Mostrar los bloques de horarios (respetando el orden y formato)
-    for (let block of semana.bloques) {
-      html += `<div class="schedule-block">`;
-      if (block.numero) html += `<div class="block-day">${block.numero}</div>`;
-      if (block.dia) html += `<div class="block-day">${block.dia}</div>`;
-      if (block.hora) html += `<div class="block-time">${block.hora}</div>`;
-      if (block.curso) html += `<div class="course-name">${block.curso}</div>`;
-      if (block.profesor) html += `<div class="teacher-name">${block.profesor}</div>`;
-      if (block.ubicacion) html += `<div class="location">${block.ubicacion}</div>`;
-      html += `</div>`;
-    }
+    // Convertir el Map a un array y ordenar por día y luego por número (ascendente)
+    const rows = Array.from(map.values());
+    rows.sort((a, b) => {
+      if (a.dayIndex !== b.dayIndex) return a.dayIndex - b.dayIndex;
+      return a.numDia - b.numDia;
+    });
 
+    // Generar HTML
+    let html = '';
+    for (const row of rows) {
+      const dayName = DAY_NAMES[row.dayIndex];
+      const activeClass = ''; // ya no resaltamos ningún día especial
+      html += `<div class="day-row">`;
+      html += `<div class="day-label">`;
+      html += `<div class="dl-num">${row.numDia}</div>`;
+      html += `<div class="dl-abbr">${dayName}</div>`;
+      html += `</div>`;
+      html += `<div class="day-cards">`;
+      if (row.classes.length === 0) {
+        // Día sin clases: mostramos una línea vacía sutil (igual que el código original)
+        html += `<div class="day-empty-line"></div>`;
+      } else {
+        for (const cls of row.classes) {
+          html += `<div class="class-card">`;
+          if (cls.time) html += `<div class="cc-time">${cls.time}</div>`;
+          if (cls.course) html += `<div class="cc-course">${cls.course}</div>`;
+          if (cls.teacher) html += `<div class="cc-teacher">${cls.teacher}</div>`;
+          if (cls.location && cls.location.trim() !== '') html += `<div class="cc-location">${cls.location}</div>`;
+          html += `</div>`;
+        }
+      }
+      html += `</div></div>`;
+    }
     container.innerHTML = html;
   }
 
-  // Navegación entre semanas (deslizar vertical)
-  let touchStartY = 0;
-
-  function navigate(delta) {
-    let newIndex = currentIndex + delta;
-    if (newIndex < 0) newIndex = 0;
-    if (newIndex >= semanas.length) newIndex = semanas.length - 1;
-    if (newIndex === currentIndex) return;
-
-    currentIndex = newIndex;
+  function render() {
     renderWeekStrip();
-    renderContent();
+    renderSchedule();
   }
 
-  // Eventos táctiles para deslizar
-  function initSwipe() {
-    const container = document.getElementById("contentContainer");
-    if (!container) return;
-    container.addEventListener("touchstart", (e) => {
-      touchStartY = e.touches[0].clientY;
-    }, { passive: true });
-    container.addEventListener("touchend", (e) => {
-      if (!touchStartY) return;
-      const diff = e.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(diff) > 50) {
-        navigate(diff > 0 ? -1 : 1);
-      }
-      touchStartY = 0;
-    });
+  // Navegación entre semanas (deslizar verticalmente)
+  function navigate(direction) {
+    if (isAnimating) return;
+    const next = currentIndex + direction;
+    if (next < 0 || next >= semanas.length) return;
+
+    isAnimating = true;
+    const sched = document.getElementById('schedule');
+    const outClass = direction > 0 ? 'slide-out-up' : 'slide-out-down';
+    const inClass  = direction > 0 ? 'slide-in-up'  : 'slide-in-down';
+
+    sched.classList.add(outClass);
+    setTimeout(() => {
+      sched.classList.remove(outClass);
+      currentIndex = next;
+      render();
+      sched.classList.add(inClass);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      setTimeout(() => {
+        sched.classList.remove(inClass);
+        isAnimating = false;
+      }, 200);
+    }, 180);
   }
 
-  // Botón volver (semana anterior)
-  document.getElementById("backBtn")?.addEventListener("click", () => navigate(-1));
+  // Eventos táctiles (deslizar vertical)
+  let touchStartY = 0, moved = false;
+  document.addEventListener('touchstart', e => {
+    touchStartY = e.touches[0].clientY;
+    moved = false;
+  }, { passive: true });
+  document.addEventListener('touchmove', () => { moved = true; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (!moved) return;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dy) > 50) {
+      navigate(dy < 0 ? +1 : -1);
+    }
+    touchStartY = 0;
+  });
 
-  // Rueda del mouse para escritorio
+  // Rueda del mouse
   let wheelCooldown = false;
-  document.addEventListener("wheel", (e) => {
+  document.addEventListener('wheel', e => {
     e.preventDefault();
     if (wheelCooldown) return;
     wheelCooldown = true;
     setTimeout(() => { wheelCooldown = false; }, 400);
-    navigate(e.deltaY > 0 ? 1 : -1);
+    navigate(e.deltaY > 0 ? +1 : -1);
   }, { passive: false });
 
+  // Botón volver
+  document.getElementById('backBtn')?.addEventListener('click', () => navigate(-1));
+
   // Inicializar
-  renderWeekStrip();
-  renderContent();
-  initSwipe();
+  render();
 </script>
 </body>
 </html>
