@@ -20,7 +20,9 @@
       overflow-x: hidden;
     }
 
-    /* HEADER */
+    /* ══════════════════════════
+       HEADER
+    ══════════════════════════ */
     .header {
       background: #2b4a91;
       color: white;
@@ -48,7 +50,9 @@
       letter-spacing: 0.2px;
     }
 
-    /* WEEK STRIP (calendario azul) */
+    /* ══════════════════════════
+       WEEK STRIP
+    ══════════════════════════ */
     .week-strip {
       background: #2b4a91;
       padding: 2px 2px 0;
@@ -98,6 +102,18 @@
       color: #fff;
       font-weight: 700;
     }
+    .dc-num.is-today {
+      color: #4db8ff;
+    }
+    .dc-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #4db8ff;
+    }
+    .dc-dot.hidden { visibility: hidden; }
+
+    /* pill handle */
     .week-pill {
       display: flex;
       justify-content: center;
@@ -110,16 +126,20 @@
       background: rgba(255,255,255,0.18);
     }
 
-    /* SCHEDULE (tarjetas) */
+    /* ══════════════════════════
+       SCHEDULE
+    ══════════════════════════ */
     .schedule {
       padding: 4px 10px 48px;
     }
+
     .day-row {
       display: flex;
       align-items: flex-start;
       padding: 14px 2px 4px;
       gap: 10px;
     }
+
     .day-label {
       min-width: 48px;
       text-align: center;
@@ -132,22 +152,36 @@
       color: #a8b4bf;
       line-height: 1;
     }
+    .dl-num.active { color: #1a7fd4; }
     .dl-abbr {
       font-size: 0.75rem;
       color: #a8b4bf;
       margin-top: 2px;
     }
+    .dl-abbr.active { color: #1a7fd4; }
+
     .day-cards {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 9px;
     }
+
+    .day-empty-line {
+      flex: 1;
+      height: 1px;
+      background: #ced5de;
+      align-self: center;
+      margin-top: 2px;
+    }
+
     .class-card {
       background: #ffffff;
       border-radius: 13px;
       padding: 13px 15px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 0 1px rgba(0,0,0,0.04);
+      box-shadow:
+        0 1px 3px rgba(0,0,0,0.07),
+        0 0 1px rgba(0,0,0,0.04);
     }
     .cc-time {
       font-size: 0.92rem;
@@ -173,7 +207,7 @@
       color: #6b7c8d;
     }
 
-    /* animaciones */
+    /* animaciones verticales */
     .schedule.slide-out-up    { animation: slideOutUp   0.18s ease forwards; }
     .schedule.slide-out-down  { animation: slideOutDown 0.18s ease forwards; }
     .schedule.slide-in-up     { animation: slideInUp    0.18s ease forwards; }
@@ -186,8 +220,9 @@
 </head>
 <body>
 
+<!-- HEADER -->
 <header class="header">
-  <button class="btn-back" id="backBtn" aria-label="Volver">
+  <button class="btn-back" aria-label="Volver">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
          stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="15 18 9 12 15 6"/>
@@ -196,269 +231,250 @@
   <span class="header-title">ClassTimes</span>
 </header>
 
+<!-- WEEK STRIP -->
 <div class="week-strip">
   <div class="week-grid" id="weekGrid"></div>
   <div class="week-pill"><div class="week-pill-bar"></div></div>
 </div>
 
+<!-- SCHEDULE -->
 <div class="schedule" id="schedule"></div>
 
 <script>
-  // ============================================================
-  // DATOS EXACTOS DE LAS TRES IMÁGENES (3875, 0627, 3833)
-  // Cada semana contiene:
-  //   - fechaInicio: domingo de esa semana (fecha real)
-  //   - items: lista de objetos que representan filas del horario.
-  //            Cada item tiene: dayIndex (0=Dom..6=Sab), numDia (número del día),
-  //            y opcionalmente un array 'classes' (mismo formato que TEMPLATE)
-  // ============================================================
+/* ─────────────────────────────────────────────────
+   PLANTILLA SEMANAL (se repite cada semana)
+───────────────────────────────────────────────── */
+const DAY_NAMES = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
 
-  // Semana 1: basada en 3875.jpg (domingo 17 de mayo de 2026)
-  const semana3875 = {
-    fechaInicio: new Date(2026, 4, 17), // 17 mayo 2026
-    items: [
-      // Dom: números 17,18,19,20 (sin clases)
-      { dayIndex: 0, numDia: 17, classes: [] },
-      { dayIndex: 0, numDia: 18, classes: [] },
-      { dayIndex: 0, numDia: 19, classes: [] },
-      { dayIndex: 0, numDia: 20, classes: [] },
-      // Lun: bloque con clase
-      { dayIndex: 1, numDia: 18, classes: [{ time: "10:00 PM - 11:00 PM", course: "REV Y CALIF CUADERNOS INFORME", teacher: "UTOS CERAS, LUIS ALBERTO", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
-      // Mié: múltiples bloques (fecha real: 20 de mayo)
-      { dayIndex: 3, numDia: 20, classes: [
-        { time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMP I", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" },
-        { time: "2:00 PM - 5:00 PM", course: "SEMINARIO COMPLEMENT PRÁCT I", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" },
-        { time: "6:31 PM - 7:59 PM", course: "DESARROLLO HUMANO", teacher: "BALTAZAR VASQUEZ, NICANOR FELIX", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205" },
-        { time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMP I", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" },
-        { time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMP I", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }
-      ] }
+const TEMPLATE = [
+  {
+    dayIndex: 1,
+    classes: [
+      { time: '7:45 AM - 10:00 AM',  course: 'ARTIF INTEL WITH MACH LEAR JAV', teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
+      { time: '10:15 AM - 12:30 PM', course: 'ARTIF INTEL WITH MACH LEAR JAV', teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
+      { time: '3:30 PM - 6:30 PM',   course: 'ARTIF INTEL WITH MACH LEAR JAV', teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
     ]
-  };
-
-  // Semana 2: basada en 0627.jpg (domingo 10 de mayo de 2026)
-  const semana0627 = {
-    fechaInicio: new Date(2026, 4, 10), // 10 mayo 2026
-    items: [
-      // Dom: 10,11
-      { dayIndex: 0, numDia: 10, classes: [] },
-      { dayIndex: 0, numDia: 11, classes: [] },
-      // Lun: 11,12
-      { dayIndex: 1, numDia: 11, classes: [] },
-      { dayIndex: 1, numDia: 12, classes: [] },
-      // Mar: 12,13
-      { dayIndex: 2, numDia: 12, classes: [] },
-      { dayIndex: 2, numDia: 13, classes: [] },
-      // Mie: 13,14
-      { dayIndex: 3, numDia: 13, classes: [] },
-      { dayIndex: 3, numDia: 14, classes: [] },
-      // Jue: 14,15
-      { dayIndex: 4, numDia: 14, classes: [] },
-      { dayIndex: 4, numDia: 15, classes: [] },
-      // Vie: 15,16
-      { dayIndex: 5, numDia: 15, classes: [] },
-      { dayIndex: 5, numDia: 16, classes: [] },
-      // Bloques de clases (sin día explícito en la imagen, los asociamos a las fechas correspondientes)
-      // 7:45 AM - 10:00 AM (lunes 11)
-      { dayIndex: 1, numDia: 11, classes: [{ time: "7:45 AM - 10:00 AM", course: "ARTIF INTEL WITH MACH LEAR JAV", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
-      // 10:15 AM - 12:30 PM (lunes 11)
-      { dayIndex: 1, numDia: 11, classes: [{ time: "10:15 AM - 12:30 PM", course: "ARTIF INTEL WITH MACH LEAR JAV", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
-      // 3:30 PM - 6:30 PM (lunes 11)
-      { dayIndex: 1, numDia: 11, classes: [{ time: "3:30 PM - 6:30 PM", course: "ARTIF INTEL WITH MACH LEAR JAV", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
-      // 8:00 AM - 1:00 PM (martes 12)
-      { dayIndex: 2, numDia: 12, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
-      // 2:00 PM - 5:00 PM (martes 12)
-      { dayIndex: 2, numDia: 12, classes: [{ time: "2:00 PM - 5:00 PM", course: "SEMINARIO COMPLEMENT PRÁCTI", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
-      // 10:00 PM - 11:00 PM (martes 12)
-      { dayIndex: 2, numDia: 12, classes: [{ time: "10:00 PM - 11:00 PM", course: "REV Y CALIF CUADERNOS INFORME", teacher: "UTOS CERAS, LUIS ALBERTO", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
-      // 8:00 AM - 1:00 PM (último, sin ubicación) - lo asociamos al miércoles 13
-      { dayIndex: 3, numDia: 13, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO", location: "" }] }
+  },
+  {
+    dayIndex: 2,
+    classes: [
+      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',   teacher: 'DOCENTE NO ASIGNADO,',            location: 'ENTORNO VIRTUAL SV-EV - N/A' },
+      { time: '2:00 PM - 5:00 PM',   course: 'SEMINARIO COMPLEMENT PRÁCT I',  teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
+      { time: '10:00 PM - 11:00 PM', course: 'REV Y CALIF CUADERNOS INFORME', teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'ENTORNO VIRTUAL SV-EV - N/A' },
     ]
-  };
-
-  // Semana 3: basada en 3833.jpg (domingo 17 de mayo de 2026)
-  const semana3833 = {
-    fechaInicio: new Date(2026, 4, 17), // 17 mayo 2026
-    items: [
-      // Dom: 17,18
-      { dayIndex: 0, numDia: 17, classes: [] },
-      { dayIndex: 0, numDia: 18, classes: [] },
-      // Lun: 19
-      { dayIndex: 1, numDia: 19, classes: [] },
-      // Mar: 20
-      { dayIndex: 2, numDia: 20, classes: [] },
-      // Mie: 21
-      { dayIndex: 3, numDia: 21, classes: [] },
-      // Jue: 22
-      { dayIndex: 4, numDia: 22, classes: [] },
-      // Vie: 23
-      { dayIndex: 5, numDia: 23, classes: [] },
-      // Bloque: 20 - Mie (20 de mayo)
-      { dayIndex: 3, numDia: 20, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
-      // Bloque: 2:00 PM - 5:00 PM (sin número, lo asociamos al miércoles 20)
-      { dayIndex: 3, numDia: 20, classes: [{ time: "2:00 PM - 5:00 PM", course: "SEMINARIO COMPLEMENT PRÁCTI", teacher: "UTOS CERAS, LUIS ALBERTO", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108" }] },
-      // Bloque: 6:31 PM - 7:59 PM (miércoles 20)
-      { dayIndex: 3, numDia: 20, classes: [{ time: "6:31 PM - 7:59 PM", course: "DESARROLLO HUMANO", teacher: "BALTZAR VASQUEZ, NICANOR FELIX", location: "CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205" }] },
-      // Bloque: 8:00 AM - 1:00 PM (dos veces, miércoles 20)
-      { dayIndex: 3, numDia: 20, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
-      { dayIndex: 3, numDia: 20, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] },
-      // Bloque: 22 - Vie (22 de mayo)
-      { dayIndex: 5, numDia: 22, classes: [{ time: "8:00 AM - 1:00 PM", course: "FORMACIÓN PRÁCTICA EN EMPI", teacher: "DOCENTE NO ASIGNADO,", location: "ENTORNO VIRTUAL SV-EV - N/A" }] }
+  },
+  {
+    dayIndex: 3,
+    classes: [
+      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',   teacher: 'DOCENTE NO ASIGNADO,',            location: 'ENTORNO VIRTUAL SV-EV - N/A' },
+      { time: '2:00 PM - 5:00 PM',   course: 'SEMINARIO COMPLEMENT PRÁCT I',  teacher: 'UTOS CERAS, LUIS ALBERTO',        location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 108' },
+      { time: '6:31 PM - 7:59 PM',   course: 'DESARROLLO HUMANO',             teacher: 'BALTAZAR VASQUEZ, NICANOR FELIX', location: 'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 205' },
     ]
-  };
+  },
+  {
+    dayIndex: 4,
+    classes: [
+      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',   teacher: 'DOCENTE NO ASIGNADO,',            location: 'ENTORNO VIRTUAL SV-EV - N/A' },
+    ]
+  },
+  {
+    dayIndex: 5,
+    classes: [
+      { time: '8:00 AM - 1:00 PM',   course: 'FORMACIÓN PRÁCTICA EN EMP I',   teacher: 'DOCENTE NO ASIGNADO,',            location: 'ENTORNO VIRTUAL SV-EV - N/A' },
+    ]
+  },
+];
 
-  const semanas = [semana3875, semana0627, semana3833];
-  let currentIndex = 0;  // 0 = 3875, 1 = 0627, 2 = 3833
-  let isAnimating = false;
-  const DAY_NAMES = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+const DAYS_WITH_CLASSES = new Set(TEMPLATE.map(t => t.dayIndex));
 
-  // ------------------------------------------------------------
-  // Renderiza el week strip (calendario azul) con las fechas reales
-  // ------------------------------------------------------------
-  function renderWeekStrip() {
-    const semana = semanas[currentIndex];
-    const inicio = semana.fechaInicio;
-    const grid = document.getElementById('weekGrid');
-    if (!grid) return;
+/* ─────────────────────────────────────────────────
+   GENERACIÓN DE SEMANAS
+───────────────────────────────────────────────── */
+const EPOCH = new Date(2026, 4, 10); // Dom 10 May 2026
+EPOCH.setHours(0,0,0,0);
+const TOTAL_WEEKS = 52;
 
-    // Días de la semana (0..6)
-    const daysArray = [];
-    for (let i = 0; i < 7; i++) {
-      const fecha = new Date(inicio);
-      fecha.setDate(inicio.getDate() + i);
-      daysArray.push({ name: DAY_NAMES[i], num: fecha.getDate() });
-    }
+const today = new Date();
+today.setHours(0,0,0,0);
 
-    // El día seleccionado (círculo azul) siempre será el lunes (índice 1)
-    const selectedIdx = 1;
+function addDays(base, n) {
+  const d = new Date(base);
+  d.setDate(d.getDate() + n);
+  return d;
+}
 
-    grid.innerHTML = daysArray.map((d, idx) => `
-      <div class="day-cell">
-        <span class="dc-name">${d.name}</span>
-        <div class="dc-circle ${idx === selectedIdx ? 'is-selected' : ''}">
-          <span class="dc-num">${d.num}</span>
-        </div>
-      </div>
-    `).join('');
-  }
+function getCurrentWeekIdx() {
+  const sun = addDays(today, -today.getDay());
+  sun.setHours(0,0,0,0);
+  const idx = Math.round((sun - EPOCH) / (7 * 86400000));
+  return Math.max(0, Math.min(TOTAL_WEEKS - 1, idx));
+}
 
-  // ------------------------------------------------------------
-  // Renderiza el horario (schedule) a partir de los items de la semana actual
-  // ------------------------------------------------------------
-  function renderSchedule() {
-    const semana = semanas[currentIndex];
-    const container = document.getElementById('schedule');
-    if (!container) return;
+function buildWeek(weekIdx) {
+  const sunday = addDays(EPOCH, weekIdx * 7);
 
-    // Agrupar los items por (dayIndex, numDia) y acumular las clases.
-    // Usamos un Map con clave "dayIndex|numDia"
-    const map = new Map();
-    for (const item of semana.items) {
-      const key = `${item.dayIndex}|${item.numDia}`;
-      if (!map.has(key)) {
-        map.set(key, { dayIndex: item.dayIndex, numDia: item.numDia, classes: [] });
-      }
-      if (item.classes && item.classes.length) {
-        map.get(key).classes.push(...item.classes);
-      }
-    }
-
-    // Convertir el Map a un array y ordenar por día y luego por número (ascendente)
-    const rows = Array.from(map.values());
-    rows.sort((a, b) => {
-      if (a.dayIndex !== b.dayIndex) return a.dayIndex - b.dayIndex;
-      return a.numDia - b.numDia;
-    });
-
-    // Generar HTML
-    let html = '';
-    for (const row of rows) {
-      const dayName = DAY_NAMES[row.dayIndex];
-      const activeClass = ''; // ya no resaltamos ningún día especial
-      html += `<div class="day-row">`;
-      html += `<div class="day-label">`;
-      html += `<div class="dl-num">${row.numDia}</div>`;
-      html += `<div class="dl-abbr">${dayName}</div>`;
-      html += `</div>`;
-      html += `<div class="day-cards">`;
-      if (row.classes.length === 0) {
-        // Día sin clases: mostramos una línea vacía sutil (igual que el código original)
-        html += `<div class="day-empty-line"></div>`;
-      } else {
-        for (const cls of row.classes) {
-          html += `<div class="class-card">`;
-          if (cls.time) html += `<div class="cc-time">${cls.time}</div>`;
-          if (cls.course) html += `<div class="cc-course">${cls.course}</div>`;
-          if (cls.teacher) html += `<div class="cc-teacher">${cls.teacher}</div>`;
-          if (cls.location && cls.location.trim() !== '') html += `<div class="cc-location">${cls.location}</div>`;
-          html += `</div>`;
-        }
-      }
-      html += `</div></div>`;
-    }
-    container.innerHTML = html;
-  }
-
-  function render() {
-    renderWeekStrip();
-    renderSchedule();
-  }
-
-  // Navegación entre semanas (deslizar verticalmente)
-  function navigate(direction) {
-    if (isAnimating) return;
-    const next = currentIndex + direction;
-    if (next < 0 || next >= semanas.length) return;
-
-    isAnimating = true;
-    const sched = document.getElementById('schedule');
-    const outClass = direction > 0 ? 'slide-out-up' : 'slide-out-down';
-    const inClass  = direction > 0 ? 'slide-in-up'  : 'slide-in-down';
-
-    sched.classList.add(outClass);
-    setTimeout(() => {
-      sched.classList.remove(outClass);
-      currentIndex = next;
-      render();
-      sched.classList.add(inClass);
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      setTimeout(() => {
-        sched.classList.remove(inClass);
-        isAnimating = false;
-      }, 200);
-    }, 180);
-  }
-
-  // Eventos táctiles (deslizar vertical)
-  let touchStartY = 0, moved = false;
-  document.addEventListener('touchstart', e => {
-    touchStartY = e.touches[0].clientY;
-    moved = false;
-  }, { passive: true });
-  document.addEventListener('touchmove', () => { moved = true; }, { passive: true });
-  document.addEventListener('touchend', e => {
-    if (!moved) return;
-    const dy = e.changedTouches[0].clientY - touchStartY;
-    if (Math.abs(dy) > 50) {
-      navigate(dy < 0 ? +1 : -1);
-    }
-    touchStartY = 0;
+  const days = Array.from({ length: 7 }, (_, d) => {
+    const date = addDays(sunday, d);
+    date.setHours(0,0,0,0);
+    return {
+      name: DAY_NAMES[d],
+      num: date.getDate(),
+      dot: DAYS_WITH_CLASSES.has(d),
+      isToday: date.getTime() === today.getTime(),
+    };
   });
 
-  // Rueda del mouse
-  let wheelCooldown = false;
-  document.addEventListener('wheel', e => {
-    e.preventDefault();
-    if (wheelCooldown) return;
-    wheelCooldown = true;
-    setTimeout(() => { wheelCooldown = false; }, 400);
-    navigate(e.deltaY > 0 ? +1 : -1);
-  }, { passive: false });
+  // El día activo/seleccionado: hoy si estamos en la semana actual, si no el Lunes
+  const isCurrentWeek = weekIdx === getCurrentWeekIdx();
+  const selectedDay = isCurrentWeek ? today.getDay() : 1;
 
-  // Botón volver
-  document.getElementById('backBtn')?.addEventListener('click', () => navigate(-1));
+  const schedule = TEMPLATE.map(t => {
+    const date = addDays(sunday, t.dayIndex);
+    return {
+      dayIndex: t.dayIndex,
+      name: DAY_NAMES[t.dayIndex],
+      num: date.getDate(),
+      classes: t.classes,
+      active: t.dayIndex === selectedDay,
+    };
+  });
 
-  // Inicializar
-  render();
+  // Sábado vacío
+  const sat = addDays(sunday, 6);
+  schedule.push({ dayIndex: 6, name: 'Sab', num: sat.getDate(), classes: [], empty: true });
+
+  return { days, schedule, selectedDay };
+}
+
+/* ─────────────────────────────────────────────────
+   ESTADO
+───────────────────────────────────────────────── */
+let current = getCurrentWeekIdx();
+
+/* ─────────────────────────────────────────────────
+   RENDER
+───────────────────────────────────────────────── */
+function renderGrid() {
+  const { days, selectedDay } = buildWeek(current);
+  document.getElementById('weekGrid').innerHTML = days.map((d, i) => `
+    <div class="day-cell">
+      <span class="dc-name">${d.name}</span>
+      <div class="dc-circle ${i === selectedDay ? 'is-selected' : ''}">
+        <span class="dc-num ${d.isToday && i !== selectedDay ? 'is-today' : ''}">${d.num}</span>
+      </div>
+      <span class="dc-dot ${d.dot ? '' : 'hidden'}"></span>
+    </div>
+  `).join('');
+}
+
+function renderSchedule() {
+  const { schedule } = buildWeek(current);
+  document.getElementById('schedule').innerHTML = schedule.map(day => {
+    if (day.empty) {
+      return `
+        <div class="day-row">
+          <div class="day-label">
+            <div class="dl-num">${day.num}</div>
+            <div class="dl-abbr">${day.name}</div>
+          </div>
+          <div class="day-empty-line"></div>
+        </div>`;
+    }
+    return `
+      <div class="day-row">
+        <div class="day-label">
+          <div class="dl-num ${day.active ? 'active' : ''}">${day.num}</div>
+          <div class="dl-abbr ${day.active ? 'active' : ''}">${day.name}</div>
+        </div>
+        <div class="day-cards">
+          ${day.classes.map(c => `
+            <div class="class-card">
+              <div class="cc-time">${c.time}</div>
+              <div class="cc-course">${c.course}</div>
+              <div class="cc-teacher">${c.teacher}</div>
+              <div class="cc-location">${c.location}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function render() {
+  renderGrid();
+  renderSchedule();
+}
+
+/* ─────────────────────────────────────────────────
+   NAVEGACIÓN
+───────────────────────────────────────────────── */
+let isAnimating = false;
+
+function navigate(direction) {
+  // +1 = semana siguiente, -1 = semana anterior
+  if (isAnimating) return;
+  const next = current + direction;
+  if (next < 0 || next >= TOTAL_WEEKS) return;
+
+  isAnimating = true;
+  const sched = document.getElementById('schedule');
+  const outClass = direction > 0 ? 'slide-out-up'   : 'slide-out-down';
+  const inClass  = direction > 0 ? 'slide-in-up'    : 'slide-in-down';
+
+  sched.classList.add(outClass);
+  setTimeout(() => {
+    sched.classList.remove(outClass);
+    current = next;
+    render();
+    sched.classList.add(inClass);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    setTimeout(() => {
+      sched.classList.remove(inClass);
+      isAnimating = false;
+    }, 200);
+  }, 180);
+}
+
+/* ─────────────────────────────────────────────────
+   TOUCH — deslizar arriba = siguiente, abajo = anterior
+───────────────────────────────────────────────── */
+let startX = 0, startY = 0, moved = false;
+
+document.addEventListener('touchstart', e => {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  moved  = false;
+}, { passive: true });
+
+document.addEventListener('touchmove', () => { moved = true; }, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!moved) return;
+  const dx = e.changedTouches[0].clientX - startX;
+  const dy = e.changedTouches[0].clientY - startY;
+  // Solo activar si el gesto es principalmente vertical
+  if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
+    navigate(dy < 0 ? +1 : -1);
+  }
+}, { passive: true });
+
+/* ─────────────────────────────────────────────────
+   RUEDA DEL MOUSE — bajar = siguiente, subir = anterior
+───────────────────────────────────────────────── */
+let wheelCooldown = false;
+
+document.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (wheelCooldown) return;
+  wheelCooldown = true;
+  setTimeout(() => { wheelCooldown = false; }, 400);
+  navigate(e.deltaY > 0 ? +1 : -1);
+}, { passive: false });
+
+/* ─────────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────────── */
+render();
 </script>
 </body>
 </html>
