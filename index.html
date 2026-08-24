@@ -73,11 +73,12 @@
     .dc-circle {
       width: 34px; height: 34px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center; margin-bottom: 4px;
+      transition: background 0.15s;
     }
     .dc-circle.selected { background: #3d8fd1; }
     .dc-num { font-size: 1.05rem; font-weight: 400; color: #3a4a5c; line-height: 1; }
     .dc-circle.selected .dc-num { color: #fff; font-weight: 700; }
-    .dc-num.is-today { color: #3d8fd1; }
+    .dc-num.is-today { color: #3d8fd1; font-weight: 500; }
     .dc-dot { width: 5px; height: 5px; border-radius: 50%; background: #3d8fd1; }
     .dc-dot.hidden { visibility: hidden; }
 
@@ -245,44 +246,52 @@
 <script>
 /* ═══════════════════════════════════════════
    DATOS CLASES — por getDay() JS (0=Dom…6=Sab)
+   Actualizado según horario vigente (24-29 ago 2026)
 ═══════════════════════════════════════════ */
 const WEEKLY = {
   0: [],
   1: [
-    { time:'8:00 AM - 1:00 PM',  course:'FORMACIÓN PRÁTICA EN EMP II',
-      teacher:'DOCENTE NO ASIGNADO',        location:'ENTORNO VIRTUAL SV-EV - N/A' },
+    { time:'8:00 AM - 2:00 PM',  course:'FORMACIÓN PRÁCTICA EN EMP II',
+      teacher:'DOCENTE NO ASIGNADO,',       location:'EDIF EXTERNO A SENATI 00-EX - N/A' },
+    { time:'6:31 PM - 7:59 PM',  course:'CALIDAD TOTAL',
+      teacher:'MUCHA LOPEZ, FRANK CRISTTIAN', location:'CFP RIO NEGRO-PRINCIPAL 1 34-P1 - 201' },
+    { time:'8:00 PM - 9:30 PM',  course:'EMPLEABILID Y DESARROLL PROFES',
+      teacher:'LEON CASTRO, MARCO ANTONIO',   location:'CFP RIO NEGRO-PRINCIPAL 1 34-P1 - 201' },
   ],
   2: [
-    { time:'8:00 AM - 1:00 PM',   course:'FORMACIÓN PRÁCTICA EN EMP II',
-      teacher:'DOCENTE NO ASIGNADO,',            location:'ENTORNO VIRTUAL SV-EV - N/A' },
-    { time:'3:30 PM - 5:00 PM',   course:'INGLÉS TÉCNICO',
-      teacher:'SAAVEDRA NUÑUVERO, JULIO ALEXANDER',        location:'ENTORNO VIRTUAL SV-EV - N/A' },
+    { time:'8:00 AM - 2:00 PM',  course:'FORMACIÓN PRÁCTICA EN EMP II',
+      teacher:'DOCENTE NO ASIGNADO,',         location:'EDIF EXTERNO A SENATI 00-EX - N/A' },
+    { time:'3:30 PM - 5:00 PM',  course:'INGLÉS TÉCNICO',
+      teacher:'SAAVEDRA NUÑUVERO, JULIO ALEXANDER', location:'ENTORNO VIRTUAL SV-EV - N/A' },
   ],
   3: [
-    { time:'8:00 AM - 1:00 PM',   course:'FORMACIÓN PRÁCTICA EN EMP II',
-      teacher:'DOCENTE NO ASIGNADO',            location:'ENTORNO VIRTUAL SV-EV - N/A' },
+    { time:'8:00 AM - 2:00 PM',  course:'FORMACIÓN PRÁCTICA EN EMP II',
+      teacher:'DOCENTE NO ASIGNADO,',         location:'EDIF EXTERNO A SENATI 00-EX - N/A' },
   ],
   4: [
-    { time:'8:00 AM - 1:00 PM',   course:'FORMACIÓN PRÁCTICA EN EMP II',
-      teacher:'DOCENTE NO ASIGNADO,',            location:'ENTORNO VIRTUAL SV-EV - N/A' },
-    { time:'3:30 PM - 5:45 PM', course:'DISEÑO DE DESARROLLO DE APP MÓVIL',
-      teacher:'PEREZ RAMOS, JUVENAL',             location:'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 204'},
-    { time:'6:00 PM - 8:15 PM',   course:'DISEÑO DE DESARROLLO DE APP MÓVIL',
-      teacher:'DOCENTE NO ASIGNADO,',            location:'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 204' },
+    { time:'8:00 AM - 2:00 PM',  course:'FORMACIÓN PRÁCTICA EN EMP II',
+      teacher:'DOCENTE NO ASIGNADO,',         location:'EDIF EXTERNO A SENATI 00-EX - N/A' },
+    { time:'3:30 PM - 5:45 PM',  course:'DISEÑO DESARROLLO DE APP MÓVIL',
+      teacher:'PEREZ RAMOS, JUVENAL',         location:'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 204' },
+    { time:'6:00 PM - 8:15 PM',  course:'DISEÑO DESARROLLO DE APP MÓVIL',
+      teacher:'PEREZ RAMOS, JUVENAL',         location:'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 204' },
   ],
   5: [
-    { time:'8:00 AM - 1:00 PM',   course:'FORMACIÓN PRÁCTICA EN EMP II',
-      teacher:'DOCENTE NO ASIGNADO,',            location:'ENTORNO VIRTUAL SV-EV - N/A' },
-    { time:'3:30 - 6:30 PM',   course:'SEMINARIO COMPLEMENT PRÁCT ',
-      teacher:'DOCENTE NO ASIGNADO,',            location:'ENTORNO VIRTUAL SV-EV - N/A' },
+    { time:'8:00 AM - 2:00 PM',  course:'FORMACIÓN PRÁCTICA EN EMP II',
+      teacher:'DOCENTE NO ASIGNADO,',         location:'EDIF EXTERNO A SENATI 00-EX - N/A' },
+    { time:'3:30 PM - 6:30 PM',  course:'SEMINARIO COMPLEMENT PRÁCT II',
+      teacher:'CASTRO IÑIGO, GUNAR',          location:'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 204' },
   ],
-  6: []
+  6: [
+    { time:'3:30 PM - 6:30 PM',  course:'SEMINARIO COMPLEMENT PRÁCT II',
+      teacher:'CASTRO IÑIGO, GUNAR',          location:'CFP RIO NEGRO-PRINCIPAL 2 34-P2 - 204' },
+  ]
 };
 
 const DAY_NAMES   = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
 const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
                      'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const HAS_DOT     = new Set([1,2,3,4,5]); // Lun-Vie tienen punto
+const HAS_DOT     = new Set([1,2,3,4,5,6]); // Lun-Sab tienen punto
 
 /* ═══════════════════════════════════════════
    FECHA REAL
